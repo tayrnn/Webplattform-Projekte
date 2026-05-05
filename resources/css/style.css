@@ -1,0 +1,8 @@
+:root {
+    --primary: #00457D; /* Dein Haupt-Blau */
+    --accent: #c7e2f7;
+    --bg-light: #F4F7F6;
+}
+
+body { background-color: var(--bg-light); font-family: sans-serif; }
+.btn-primary { background: var(--primary); color: white; padding: 10px; }
