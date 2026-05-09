@@ -1,26 +1,29 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProjektController;
 
-// Startseite wurde von Laravel vorgegeben, kann aber angepasst werden. Aktuell zeigt sie die welcome.blade.php an, die sich im resources/views Ordner befindet. Dort könnte man auch eine eigene Startseite erstellen, z.B. mit Informationen über die Plattform, Anleitungen oder Neuigkeiten. Die Route definiert, dass wenn jemand die URL "/dashboard" aufruft, 
-// die welcome.blade.php angezeigt wird und somit die Startseite der Anwendung ist                  
-Route::get('/dashboard', function () {
-    return view('dashboard'); 
-});
+// Startseite zeigt die Projektliste
+Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
 
-// --- 3 ROLLEN-DASHBOARDS ---
+// Meine Projekte (nur eigene Ideen des eingeloggten Studenten)
+Route::get('/projekte/meine', [ProjektController::class, 'meine'])->name('projekte.meine');
 
-// Lehrende-Ansicht
-Route::get('/lehrende', function () {
-    return view('lehrende.dashboard');
-});
+// Projekt erstellen
+Route::get('/projekte/erstellen', [ProjektController::class, 'erstellen'])->name('projekte.erstellen');
+Route::post('/projekte/speichern', [ProjektController::class, 'speichern'])->name('projekte.speichern');
 
-// Admin-Ansicht
-Route::get('/admin', function () {
-    return view('admin.dashboard');
-});
+// Projekt Details
+Route::get('/projekte/{id}', [ProjektController::class, 'details'])->name('projekte.details');
 
-// Studenten-Ansicht
-Route::get('/student', function () {
-    return view('student.dashboard');
+// Projekt bearbeiten (nur eigene Idee)
+Route::get('/projekte/{id}/bearbeiten', [ProjektController::class, 'bearbeiten'])->name('projekte.bearbeiten');
+Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisieren'])->name('projekte.aktualisieren');
+
+// Projekt loeschen (nur eigene Idee)
+Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
+
+// Test-Route (von Taqwa)
+Route::get('/test', function () {
+    return view('test');
 });
