@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NutzerController;
 
-// Startseite wurde von Laravel vorgegeben, kann aber angepasst werden. Aktuell zeigt sie die welcome.blade.php an, die sich im resources/views Ordner befindet. Dort könnte man auch eine eigene Startseite erstellen, z.B. mit Informationen über die Plattform, Anleitungen oder Neuigkeiten. Die Route definiert, dass wenn jemand die URL "/dashboard" aufruft, 
-// die welcome.blade.php angezeigt wird und somit die Startseite der Anwendung ist                  
+// Startseite
 Route::get('/dashboard', function () {
-    return view('dashboard'); 
+    return view('dashboard');
 });
 
 // --- 3 ROLLEN-DASHBOARDS ---
@@ -24,3 +24,8 @@ Route::get('/admin', function () {
 Route::get('/student', function () {
     return view('student.dashboard');
 });
+
+// Benutzer anlegen
+Route::get('/admin/benutzer-anlegen', [NutzerController::class, 'benutzerAnlegen']);
+
+Route::post('/admin/benutzer-speichern', [NutzerController::class, 'speichern']);
