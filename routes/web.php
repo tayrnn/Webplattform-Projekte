@@ -24,3 +24,12 @@ Route::get('/admin', function () {
 Route::get('/student', function () {
     return view('student.dashboard');
 });
+
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
+// Login anzeigen
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])
+    ->name('login');
+
+// Login verarbeiten
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
