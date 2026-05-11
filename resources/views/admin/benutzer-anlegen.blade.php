@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html lang="de">
+@extends('layouts.app')
+@section('content')
 
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Benutzer anlegen</title>
@@ -14,16 +13,22 @@
         }
 
         .container{
-            width: 500px;
+            max-width: 700px;
+            width:100%;
+            margin: 40x auto;
             background: white;
-            padding: 30px;
-            border-radius: 10px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.08);
         }
 
-        input{
+        input, select {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing:border-box;
         }
 
         button{
@@ -38,9 +43,7 @@
             margin-bottom: 30px;
         }
     </style>
-</head>
 
-<body>
 @if(session('success'))
     <div style="
         background: #d4edda;
@@ -56,7 +59,7 @@
 
     <h2>Benutzerverwaltung / Neuen Benutzer anlegen</h2>
 
-    <form method="POST" action="/admin/benutzer-speichern">
+    <form method="POST" action="/admin/nutzer-speichern">
 
         @csrf
 
@@ -79,6 +82,17 @@
             <input type="email" name="email">
         </div>
 
+        <br>
+
+      <div>
+          <label>Rolle</label>
+          <select name="role" required>
+              <option value="student">Student</option>
+              <option value="lehrender">Lehrender</option>
+              <option value="admin">Admin</option>
+          </select>
+      </div>
+
         <button type="submit">
             Benutzer erstellen
         </button>
@@ -87,5 +101,4 @@
 
 </div>
 
-</body>
-</html>
+@endsection

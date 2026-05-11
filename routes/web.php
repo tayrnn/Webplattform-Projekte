@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NutzerController;
 use App\Http\Controllers\ProjektController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
 
 // Startseite
 Route::get('/dashboard', function () {
@@ -14,18 +16,22 @@ Route::get('/dashboard', function () {
 
 // Lehrende-Ansicht
 Route::get('/lehrende', function () {
-    return view('lehrende.dashboard');
+    $projekte = Project::all();
+    return view('lehrende.dashboard', compact('projekte'));
 });
 
 // Admin-Ansicht
 Route::get('/admin', function () {
-    return view('admin.dashboard');
+    $projekte = Project::all();
+    return view('admin.dashboard', compact('projekte'));
 });
 
 // Studenten-Ansicht
 Route::get('/student', function () {
-    return view('student.dashboard');
+    $projekte = Project::where('ersteller_id', Auth::id())->get();
+    return view('student.dashboard', compact('projekte'));
 });
+
 // Startseite zeigt die Projektliste
 Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
 
@@ -52,23 +58,21 @@ Route::get('/test', function () {
 });
 
 // Benutzer anlegen
-Route::get('/admin/benutzer-anlegen', [NutzerController::class, 'benutzerAnlegen']);
+Route::get('/admin/nutzer/neu', [NutzerController::class, 'benutzerAnlegen']);
 
-Route::post('/admin/benutzer-speichern', [NutzerController::class, 'speichern']);
-// Formular: Neue Idee erstellen (Nur für Studenten)
-Route::get('/student/neue-idee', function () {
-    return view('student.create-idea');
-});
+Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
 // --- TAB-ROUTEN FÜR STUDENTEN ---
 
 // Tab 1: Alle Ideen (lädt die normale Übersicht)
 Route::get('/student/alle-ideen', function () {
-    return view('student.dashboard');
+   $projekte = Project::all();
+    return view('student.dashboard', compact('projekte'));
 });
 
 // Tab 2: Meine Projekte (lädt zum Testen vorerst auch das Dashboard)
 Route::get('/student/meine-projekte', function () {
-    return view('student.dashboard');
+    $projekte = Project::where('ersteller_id', Auth::id())->get();
+    return view('student.dashboard', compact('projekte'));
 });
 Route::get('/student/nutzer/neu', function () {
     // Hier kommt später das Formular hin,
@@ -78,23 +82,21 @@ Route::get('/student/nutzer/neu', function () {
 // --- TAB-ROUTEN FÜR LEHRER ---
 // Tab 1: Alle Ideen (lädt die normale Übersicht)
 Route::get('/lehrende/alle-ideen', function () {
-    return view('lehrende.dashboard');
+    $projekte = Project::all();
+    return view('lehrende.dashboard', compact('projekte'));
 });
 // Tab 2: Betreute Projekte (lädt zum Testen vorerst auch das Dashboard)
 Route::get('/lehrende/betreute-projekte', function () {
-    return view('lehrende.dashboard');
+    $projekte = Project::all();
+    return view('lehrende.dashboard', compact('projekte'));
 }); 
 // 2. Admin Nutzerverwaltung (Übersicht aller Nutzer)
 Route::get('/admin/nutzer', function () {
-    // Hier kannst du später eine Tabelle mit allen Nutzern anzeigen lassen
-    return view('admin.dashboard'); 
+    // Hier kann später eine Tabelle mit allen Nutzern anzeigen lassen
+    $projekte = Project::all();
+    return view('admin.dashboard', compact('projekte'));
 });
 
-// 3. Admin: Nutzer anlegen (Das Formular)
-Route::get('/admin/nutzer/neu', function () {
-    // Hier kommt später das Formular hin, ähnlich wie bei "Neue Idee"
-    return "Hier entsteht das Formular zum Nutzer anlegen!";
-});
 
 // Login anzeigen
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])

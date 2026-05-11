@@ -11,7 +11,21 @@
     <header class="bg-[#87afc7] shadow-sm border-b border-gray-300">
         <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
             
-            <a href="{{ url('/') }}" class="flex items-center gap-3 no-underline group">
+           @php
+    $homeUrl = '/login';
+
+    if (Auth::check()) {
+        if (Auth::user()->role === 'admin') {
+            $homeUrl = '/admin';
+        } elseif (Auth::user()->role === 'lehrender') {
+            $homeUrl = '/lehrende';
+        } elseif (Auth::user()->role === 'student') {
+            $homeUrl = '/student';
+        }
+    }
+@endphp
+
+<a href="{{ $homeUrl }}" class="flex items-center gap-3 no-underline group">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-10 w-auto">
                 <div class="flex items-center text-2xl font-bold tracking-tight">
                     <span class="text-[#0066cc]">Uni</span>

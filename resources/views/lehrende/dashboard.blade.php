@@ -27,23 +27,16 @@
 </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <x-project-card
-                    title="Erstes Projekt"
-                    status="offen"
-                    :needsSupervision="true"
-                />
-
-                <x-project-card
-                    title="Zweites Projekt"
-                    status="In Bearbeitung"
-                    :needsSupervision="false"
-                />
-
-                <x-project-card
-                    title="Drittes Projekt"
-                    status="Abgeschlossen"
-                    :needsSupervision="true"
-                />
+               @forelse($projekte as $projekt)
+    <x-project-card
+        :title="$projekt->projektname"
+        :status="$projekt->bearbeitungsstatus"
+        :needsSupervision="true"
+        :id="$projekt->id"
+    />
+@empty
+    <p>Keine Projekte vorhanden.</p>
+@endforelse
                 
             </div>
 

@@ -1,4 +1,4 @@
-@props(['title', 'status', 'needsSupervision' => false])
+@props(['title', 'status', 'needsSupervision' => false, 'id'])
 
 @php
    
@@ -42,8 +42,8 @@
 
     <!-- Link am Boden -->
     <div>
-        <a href="#" class="text-cyan-600 font-medium text-sm hover:underline">
-            Details ansehen &rarr;
-        </a>
+      <a href="{{ route('projekte.details', $id) }}" class="text-cyan-600 font-medium text-sm hover:underline">
+    Details ansehen &rarr;
+</a>
     </div>
 </div>

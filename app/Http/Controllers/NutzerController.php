@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class NutzerController extends Controller
 {
@@ -11,9 +14,26 @@ class NutzerController extends Controller
         return view('admin.benutzer-anlegen');
     }
 
-    public function speichern()
+    public function speichern(Request $request)
     {
-        return redirect('/admin/benutzer-anlegen')
-            ->with('success', 'Benutzer wurde erstellt!');
+        $validated = $request->validate([
+            'vorname' => ['required', 'string', 'max:255'],
+            'nachname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'role' => ['required', 'in:student,lehrender,admin'],
+        ]);
+
+        $temporaryPassword = Str::random(10);
+
+        User::create([
+            'name' => $validated['vorname'] . ' ' . $validated['nachname'],
+            'username' => Str::slug($validated['vorname'] . '.' . $validated['nachname']) . rand(100, 999),
+            'email' => $validated['email'],
+            'password' => Hash::make($temporaryPassword),
+            'role' => $validated['role'],
+        ]);
+
+        return redirect('/admin/nutzer/neu')
+            ->with('success', 'Benutzer wurde erstellt. Temporäres Passwort: ' . $temporaryPassword);
     }
 }

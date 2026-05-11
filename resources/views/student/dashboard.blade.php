@@ -26,7 +26,7 @@
                 </div>
 
                 <!-- Der "+ Neue Idee" Button -->
-                <a href="/student/neue-idee" class="bg-[#6ba9dc] hover:bg-[#5a91c4] text-white px-5 py-2 rounded-md font-bold transition-colors flex items-center gap-2 shadow-sm mb-1">
+                <a href="{{ route ('projekte.erstellen') }}" class="bg-[#6ba9dc] hover:bg-[#5a91c4] text-white px-5 py-2 rounded-md font-bold transition-colors flex items-center gap-2 shadow-sm mb-1">
                     <span>+</span> Neue Idee
                 </a>
             </div>
@@ -34,23 +34,18 @@
             <!-- Die Projektkarten im Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 
-                <x-project-card
-                    title="Erstes Projekt"
-                    status="offen"
-                    :needsSupervision="true"
-                />
+                @forelse($projekte as $projekt)
 
-                <x-project-card
-                    title="Zweites Projekt"
-                    status="In Bearbeitung"
-                    :needsSupervision="false"
-                />
+  <x-project-card
+    :title="$projekt->projektname"
+    :status="$projekt->bearbeitungsstatus"
+    :needsSupervision="true"
+    :id="$projekt->id"
+/>
 
-                <x-project-card
-                    title="Drittes Projekt"
-                    status="Abgeschlossen"
-                    :needsSupervision="true"
-                />
+@empty
+    <p>Keine Projekte vorhanden.</p>
+@endforelse
                 
             </div>
 

@@ -13,7 +13,6 @@ class Project extends Model
         'projektname',
         'beschreibung',
         'bearbeitungsstatus',
-        'mitglied',
         'ersteller_id',
     ];
 
