@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Projekt extends Model{
     use HasFactory;
 
-    const CREATED_AT = 'erstellungsDatum';
-    const UPDATED_AT = 'aenderungsDatum';
+
+    protected $table = 'projects';
 
     protected $fillable = [
         'projektname',
@@ -27,8 +27,7 @@ class Projekt extends Model{
 
     protected function casts(): array {
         return [
-            'erstellungsDatum' => 'datetime',
-            'aenderungsDatum' => 'datetime',
+            
             'bearbeitungsstatus' => Bearbeitungsstatus::class,
         ];
     }
