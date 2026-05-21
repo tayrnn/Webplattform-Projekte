@@ -1,4 +1,4 @@
-@props(['title', 'status', 'needsSupervision' => false, 'id'])
+@props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'id'])
 
 @php
    
@@ -37,7 +37,7 @@
 
     <!-- Text-Bereich -->
     <p class="text-gray-500 text-sm mt-6 mb-6 flex-grow">
-        Hier steht eine kurze Beschreibung des Projekts...
+        {{ Str::limit($beschreibung, 80)}}
     </p>
 
     <!-- Link am Boden -->

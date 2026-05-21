@@ -13,7 +13,6 @@
         }
 
         .container{
-            max-width: 700px;
             width:100%;
             margin: 40x auto;
             background: white;
@@ -33,9 +32,9 @@
 
         button{
             padding: 12px 20px;
-            background: blue;
+            background: #6ba9dc;
             color: white;
-            border: none;
+            border:none; border-radius:6px;
             margin-top: 20px;
         }
 

@@ -39,6 +39,7 @@
   <x-project-card
     :title="$projekt->projektname"
     :status="$projekt->bearbeitungsstatus"
+    :beschreibung="$projekt->beschreibung"
     :needsSupervision="true"
     :id="$projekt->id"
 />
