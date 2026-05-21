@@ -92,7 +92,7 @@ class ProjektController extends Controller
     }
 
     // Ein Projekt anzeigen
-    public function details($id)
+    public function details(int $id)
     {
         $projekt      = Project::with(['user'])->findOrFail($id);
         $istStudent   = Auth::check() && Auth::user()->role === 'student';
@@ -108,7 +108,7 @@ class ProjektController extends Controller
     }
 
     // Bearbeitungs-Formular anzeigen (nur fuer eigene Idee)
-    public function bearbeiten($id)
+    public function bearbeiten(int $id)
     {
         $projekt = Project::findOrFail($id);
 
@@ -121,11 +121,12 @@ class ProjektController extends Controller
         $kategorien = Category::all();
         $istStudent = true;
 
+        // View zu projekt.bearbeiten fehlt noch
         return view('projekte.bearbeiten', compact('projekt', 'kategorien', 'istStudent'));
     }
 
     // Projekt aktualisieren
-    public function aktualisieren(Request $request, $id)
+    public function aktualisieren(Request $request, int $id)
     {
         $projekt = Project::findOrFail($id);
 
@@ -150,7 +151,7 @@ class ProjektController extends Controller
     }
 
     // Projekt loeschen (nur eigene Idee)
-    public function loeschen($id)
+    public function loeschen(int $id)
     {
         $projekt = Project::findOrFail($id);
 
