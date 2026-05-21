@@ -4,33 +4,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NutzerController;
 use App\Http\Controllers\ProjektController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\DashboardController;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 
 // Startseite
-Route::get('/dashboard', function () {
-    return view('dashboard');
-});
+Route::get('/dashboard', [DashboardController::class, 'startseite']);
 
 // --- 3 ROLLEN-DASHBOARDS ---
 
 // Lehrende-Ansicht
-Route::get('/lehrende', function () {
-    $projekte = Project::all();
-    return view('lehrende.dashboard', compact('projekte'));
-});
+Route::get('/lehrende', [DashboardController::class, 'lehrendeDashboard']);
 
 // Admin-Ansicht
-Route::get('/admin', function () {
-    $projekte = Project::all();
-    return view('admin.dashboard', compact('projekte'));
-});
+Route::get('/admin', [DashboardController::class, 'adminDashboard']);
 
 // Studenten-Ansicht
-Route::get('/student', function () {
-    $projekte = Project::where('ersteller_id', Auth::id())->get();
-    return view('student.dashboard', compact('projekte'));
-});
+Route::get('/student', [DashboardController::class, 'studentDashboard']);
 
 // Startseite zeigt die Projektliste
 Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
@@ -53,49 +43,33 @@ Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisi
 Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
 
 // Test-Route (von Taqwa)
-Route::get('/test', function () {
-    return view('test');
-});
+// Route::get('/test', function () {
+//     return view('test');
+// });
 
 // Benutzer anlegen
 Route::get('/admin/nutzer/neu', [NutzerController::class, 'benutzerAnlegen']);
 
 Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
+
 // --- TAB-ROUTEN FÜR STUDENTEN ---
 
 // Tab 1: Alle Ideen (lädt die normale Übersicht)
-Route::get('/student/alle-ideen', function () {
-   $projekte = Project::all();
-    return view('student.dashboard', compact('projekte'));
-});
+Route::get('/student/alle-ideen', [DashboardController::class, 'studentAlleProjekte']);
 
 // Tab 2: Meine Projekte (lädt zum Testen vorerst auch das Dashboard)
-Route::get('/student/meine-projekte', function () {
-    $projekte = Project::where('ersteller_id', Auth::id())->get();
-    return view('student.dashboard', compact('projekte'));
-});
-Route::get('/student/nutzer/neu', function () {
-    // Hier kommt später das Formular hin,
-    return "Hier entsteht das Formular zum Projekte erstellen !";
-});
+Route::get('/student/meine-projekte', [DashboardController::class, 'studentMeineProjekte']);
+Route::get('/student/nutzer/neu', [DashboardController::class, 'studentNeuesProjekt']);
 
 // --- TAB-ROUTEN FÜR LEHRER ---
 // Tab 1: Alle Ideen (lädt die normale Übersicht)
-Route::get('/lehrende/alle-ideen', function () {
-    $projekte = Project::all();
-    return view('lehrende.dashboard', compact('projekte'));
-});
+Route::get('/lehrende/alle-ideen', [DashboardController::class, 'lehrendeAlleProjekte']);
 // Tab 2: Betreute Projekte (lädt zum Testen vorerst auch das Dashboard)
-Route::get('/lehrende/betreute-projekte', function () {
-    $projekte = Project::all();
-    return view('lehrende.dashboard', compact('projekte'));
-}); 
+Route::get('/lehrende/betreute-projekte', [DashboardController::class, 'lehrendeBetreuteProjekte']); 
+
+
 // 2. Admin Nutzerverwaltung (Übersicht aller Nutzer)
-Route::get('/admin/nutzer', function () {
-    // Hier kann später eine Tabelle mit allen Nutzern anzeigen lassen
-    $projekte = Project::all();
-    return view('admin.dashboard', compact('projekte'));
-});
+Route::get('/admin/nutzer', [DashboardController::class,'adminNutzerverwaltung']);
 
 
 // Login anzeigen
