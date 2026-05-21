@@ -34,7 +34,8 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('projekte.bearbeiten')->with('status', 'profile-updated');
+        // entsprechende Route für das Bearbeiten des Profils fehlt noch
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
