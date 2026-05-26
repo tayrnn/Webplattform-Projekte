@@ -5,8 +5,8 @@ use App\Http\Controllers\NutzerController;
 use App\Http\Controllers\ProjektController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\DashboardController;
-use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\DiskussionController;
 
 // Startseite
 Route::get('/dashboard', [DashboardController::class, 'startseite']);
@@ -78,3 +78,15 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 
 // Login verarbeiten
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+// Diskussionen
+Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])
+    ->name('diskussion.create');
+Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])
+    ->name('diskussion.speichern');
+Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])
+    ->name('diskussion.details');
+Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])
+    ->name('diskussion.antworten');
+Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])
+    ->name('diskussion.abstimmen');

@@ -2,7 +2,8 @@
 
 namespace App\Models\Projekt;
 
-use App\Models\Nutzer\Nutzer;
+use app\Models\Nutzer\Nutzer;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
