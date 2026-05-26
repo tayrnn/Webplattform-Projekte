@@ -104,3 +104,6 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 
 // Login verarbeiten
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+// abmelden button (einstellung)
+Route::post('/abmelden', [AuthenticatedSessionController::class, 'destroy'])->name('abmelden');

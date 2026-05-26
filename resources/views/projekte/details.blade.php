@@ -89,7 +89,7 @@
                 <div class="flex flex-col gap-4">
 
                     {{-- Aktionen fuer eigene Projekte --}}
-                    @if($istStudent && $projekt->user_id === auth()->id())
+                    @if($istStudent && $projekt->ersteller_id === auth()->id())
                         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                             <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Meine Idee</div>
 
