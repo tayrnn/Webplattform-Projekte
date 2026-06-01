@@ -6,21 +6,21 @@
 
     <div class="flex gap-12 items-start">
 
-        
+
         <section class="flex-1">
 
             <!-- Obere Leiste: Tabs auf der linken Seite, Button auf der rechten Seite -->
             <div class="flex justify-between items-end border-b border-gray-300 mb-8 pb-3">
-                
+
                 <!-- Die Tabs -->
                 <div class="flex gap-8">
-                    <a href="/student/alle-ideen" 
-                       class="font-bold text-lg transition-colors {{ request()->is('student/alle-ideen') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">
+                    <a href="/student/alle-ideen"
+                        class="font-bold text-lg transition-colors {{ request()->is('student/alle-ideen') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">
                         Alle Ideen
                     </a>
-                    
-                    <a href="/student/meine-projekte" 
-                       class="font-bold text-lg transition-colors {{ request()->is('student/meine-projekte') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">
+
+                    <a href="/student/meine-projekte"
+                        class="font-bold text-lg transition-colors {{ request()->is('student/meine-projekte') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">
                         Meine Projekte
                     </a>
                 </div>
@@ -33,21 +33,20 @@
 
             <!-- Die Projektkarten im Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                
+
                 @forelse($projekte as $projekt)
 
-  <x-project-card
-    :title="$projekt->projektname"
-    :status="$projekt->bearbeitungsstatus"
-    :beschreibung="$projekt->beschreibung"
-    :needsSupervision="true"
-    :id="$projekt->id"
-/>
+                <x-project-card
+                    :title="$projekt->projektname"
+                    :status="$projekt->bearbeitungsstatus"
+                    :beschreibung="$projekt->beschreibung"
+                    :needsSupervision="true"
+                    :id="$projekt->id" />
 
-@empty
-    <p>Keine Projekte vorhanden.</p>
-@endforelse
-                
+                @empty
+                <p>Keine Projekte vorhanden.</p>
+                @endforelse
+
             </div>
 
         </section>

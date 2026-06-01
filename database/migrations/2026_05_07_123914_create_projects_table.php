@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('bearbeitungsstatus')->default('offen');
             //prototyp 2?
             // $table->string('bildpfad')->nullable();
-            $table->foreignId('ersteller_id') ->nullable()
-            ->constrained('users')
-            ->nullONDelete();
+            $table->foreignId('ersteller_id')->nullable()
+                ->constrained('users')
+                ->nullONDelete();
 
             $table->timestamps();
         });

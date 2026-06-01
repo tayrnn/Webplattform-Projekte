@@ -11,10 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Prototyp I: grundlegende Kategorietabelle
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('discusstions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->foreignId('projekt_id')->constrained('projects')->cascadeOnDelete();
+
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+
+            $table->string('titel');
+
+            $table->text('beschreibung')->nullable();
+
             $table->timestamps();
         });
     }
@@ -24,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('discusstions');
     }
 };
