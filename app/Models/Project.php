@@ -13,12 +13,20 @@ class Project extends Model
         'projektname',
         'beschreibung',
         'bearbeitungsstatus',
+        'mitglied',
         'ersteller_id',
+        'is_public',
     ];
 
     // Beziehung zum Nutzer (Ersteller)
     public function user()
     {
         return $this->belongsTo(User::class, 'ersteller_id');
+    }
+
+    // Beziehung zur Kategorie
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

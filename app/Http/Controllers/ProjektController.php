@@ -15,8 +15,18 @@ class ProjektController extends Controller
         $filterKategorie = $request->input('filterKategorie');
         $filterStatus    = $request->input('filterStatus');
 
-        $projekte = Project::with(['user'])
-            ->when($filterStatus, fn($q) => $q->where('bearbeitungsstatus', $filterStatus))
+        $projekte = Project::with(['user', 'category'])
+            ->where(function($query) {
+                // Oeffentliche Projekte fuer alle sichtbar
+                $query->where('is_public', true)
+                // Private Projekte nur fuer den Ersteller sichtbar
+                ->orWhere(function($q) {
+                    $q->where('is_public', false)
+                      ->where('ersteller_id', Auth::id());
+                });
+            })
+            ->when($filterStatus,    fn($q) => $q->where('bearbeitungsstatus', $filterStatus))
+            ->when($filterKategorie, fn($q) => $q->where('category_id', $filterKategorie))
             ->latest()
             ->get();
 
@@ -39,7 +49,8 @@ class ProjektController extends Controller
     // Nur eigene Projekte des eingeloggten Studenten anzeigen
     public function meine(Request $request)
     {
-        $projekte = Project::with(['user'])
+        // Zeigt ALLE eigenen Projekte (privat + oeffentlich)
+        $projekte = Project::with(['user', 'category'])
             ->where('ersteller_id', Auth::id())
             ->latest()
             ->get();
@@ -84,7 +95,9 @@ class ProjektController extends Controller
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => 'neu',
+            'mitglied'           => '',
             'ersteller_id'       => Auth::id(),
+            'is_public'          => $request->input('is_public', 1),
         ]);
 
         return redirect()->route('projekte.liste')
@@ -94,7 +107,14 @@ class ProjektController extends Controller
     // Ein Projekt anzeigen
     public function details($id)
     {
-        $projekt      = Project::with(['user'])->findOrFail($id);
+        $projekt = Project::with(['user', 'category'])->findOrFail($id);
+
+        // Sicherheitspruefung: Private Projekte nur fuer Ersteller sichtbar
+        if (!$projekt->is_public && $projekt->ersteller_id !== Auth::id()) {
+            return redirect()->route('projekte.liste')
+                ->with('fehler', 'Dieses Projekt ist privat.');
+        }
+
         $istStudent   = Auth::check() && Auth::user()->role === 'student';
         $istLehrender = Auth::check() && Auth::user()->role === 'lehrender';
         $istAdmin     = Auth::check() && Auth::user()->role === 'admin';
@@ -143,19 +163,22 @@ class ProjektController extends Controller
         $projekt->update([
             'projektname'  => $validierteEingaben['projektname'],
             'beschreibung' => $validierteEingaben['beschreibung'],
+            'is_public'    => $request->input('is_public', 1),
         ]);
 
         return redirect()->route('projekte.details', $projekt->id)
             ->with('erfolg', 'Projektidee erfolgreich aktualisiert!');
     }
 
-    // Projekt loeschen (nur eigene Idee)
+    // Projekt loeschen (Student: nur eigene / Admin: alle)
     public function loeschen($id)
     {
         $projekt = Project::findOrFail($id);
 
-        // Sicherheitspruefung
-        if ($projekt->ersteller_id !== Auth::id()) {
+        $istAdmin = Auth::check() && Auth::user()->role === 'admin';
+
+        // Sicherheitspruefung: Student nur eigene, Admin alle
+        if (!$istAdmin && $projekt->ersteller_id !== Auth::id()) {
             return redirect()->route('projekte.liste')
                 ->with('fehler', 'Du kannst nur deine eigenen Ideen löschen.');
         }

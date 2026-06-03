@@ -61,7 +61,7 @@ Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class,
 
 Route::post('/projekte/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])
     ->name('betreuung.beenden');
-    
+
 
 // Test-Route (von Taqwa)
 Route::get('/test', function () {
@@ -115,3 +115,6 @@ Route::get('/login', [AuthenticatedSessionController::class, 'create'])
 
 // Login verarbeiten
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+// abmelden button (einstellung)
+Route::post('/abmelden', [AuthenticatedSessionController::class, 'destroy'])->name('abmelden');
