@@ -16,14 +16,14 @@ class ProjektController extends Controller
         $filterStatus    = $request->input('filterStatus');
 
         $projekte = Project::with(['user', 'category'])
-            ->where(function($query) {
+            ->where(function ($query) {
                 // Oeffentliche Projekte fuer alle sichtbar
                 $query->where('is_public', true)
-                // Private Projekte nur fuer den Ersteller sichtbar
-                ->orWhere(function($q) {
-                    $q->where('is_public', false)
-                      ->where('ersteller_id', Auth::id());
-                });
+                    // Private Projekte nur fuer den Ersteller sichtbar
+                    ->orWhere(function ($q) {
+                        $q->where('is_public', false)
+                            ->where('ersteller_id', Auth::id());
+                    });
             })
             ->when($filterStatus,    fn($q) => $q->where('bearbeitungsstatus', $filterStatus))
             ->when($filterKategorie, fn($q) => $q->where('category_id', $filterKategorie))
@@ -96,7 +96,7 @@ class ProjektController extends Controller
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => 'neu',
             'mitglied'           => '',
-            'ersteller_id'       => Auth::id(),
+            'ersteller_id'            => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
 

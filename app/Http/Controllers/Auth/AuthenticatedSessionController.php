@@ -30,15 +30,15 @@ class AuthenticatedSessionController extends Controller
 
         $user = Auth::user();
 
-if ($user->role === 'admin') {
-    return redirect('/admin');
-}
+        if ($user->role === 'admin') {
+            return redirect('/admin');
+        }
 
-if ($user->role === 'lehrender') {
-    return redirect('/lehrende');
-}
+        if ($user->role === 'lehrender') {
+            return redirect('/lehrende');
+        }
 
-return redirect('/student');
+        return redirect('/student');
     }
 
     /**
@@ -52,6 +52,6 @@ return redirect('/student');
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/login');
     }
 }

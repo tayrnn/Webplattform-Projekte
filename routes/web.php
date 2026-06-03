@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BetreuungController;
+use App\Http\Controllers\ProfileController;
 
 
 // Startseite
@@ -106,6 +107,14 @@ Route::get('/admin/nutzer', function () {
     // Hier kann später eine Tabelle mit allen Nutzern anzeigen lassen
     $projekte = Project::all();
     return view('admin.dashboard', compact('projekte'));
+});
+
+// Profil bearbeiten
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 });
 
 
