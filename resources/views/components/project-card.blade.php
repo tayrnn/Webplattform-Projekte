@@ -1,20 +1,19 @@
-@props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'id'])
+@props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'projektId' => 1, 'id'])
 
 @php
-
-// Die Farbe ändert sich automatisch, je nachdem welcher Text übergeben wird.
-$statusColor = match($status) {
-'Abgeschlossen' => 'bg-gray-400 text-gray-900',
-'In Bearbeitung' => 'bg-blue-500 text-white',
-'offen' => 'bg-[#8dc63f] text-gray-900', // Grün
-default => 'bg-gray-200 text-gray-800',
+$statusConfig = match(strtolower($status)) {
+'abgeschlossen' => ['bg' => 'bg-gray-100 text-gray-600', 'label' => 'Abgeschlossen'],
+'in bearbeitung', 'in_bearbeitung' => ['bg' => 'bg-blue-100 text-blue-700', 'label' => 'In Bearbeitung'],
+'offen' => ['bg' => 'bg-green-100 text-green-700', 'label' => 'Offen'],
+'betreuer gesucht','betreuer_gesucht' => ['bg' => 'bg-yellow-100 text-yellow-700','label' => 'Betreuer gesucht'],
+default => ['bg' => 'bg-gray-100 text-gray-500', 'label' => $status],
 };
 @endphp
 
-<!-- Das Design vom 1. Code (weiße Karte, Rahmen, Schatten) -->
-<div class="bg-white p-6 rounded-xl border border-gray-200 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
+<div class="bg-white p-6 rounded-xl border border-gray-200 flex flex-col h-full
+            shadow-sm transition-all duration-200
+            hover:border-blue-300 hover:shadow-md hover:ring-2 hover:ring-blue-100">
 
-    <!-- Kopfbereich -->
     <div class="flex justify-between items-start">
 
         <!-- Linke Seite: Titel und Label -->
@@ -23,26 +22,24 @@ default => 'bg-gray-200 text-gray-800',
 
             @if($needsSupervision)
             <!-- Das gelbe "Sucht Betreuer" Label  -->
-            <span class="inline-flex items-center gap-1 mt-2 px-2 py-1 text-[11px] font-medium rounded bg-[#fff8e1] text-[#b7791f] border border-[#f6e05e]">
+            <span
+                class="inline-flex items-center gap-1 mt-2 px-2 py-1 text-[11px] font-medium rounded bg-[#fff8e1] text-[#b7791f] border border-[#f6e05e]">
                 🔍 Sucht Betreuer
             </span>
             @endif
         </div>
-
-        <!-- Rechte Seite: Status -->
-        <span class="px-3 py-1 text-xs font-bold uppercase rounded-full ml-4 whitespace-nowrap {{ $statusColor }}">
-            {{ $status }}
+        <span class="px-3 py-1 text-xs font-semibold rounded-full ml-4 whitespace-nowrap {{ $statusConfig['bg'] }}">
+            {{ $statusConfig['label'] }}
         </span>
     </div>
 
-    <!-- Text-Bereich -->
     <p class="text-gray-500 text-sm mt-6 mb-6 flex-grow">
         {{ Str::limit($beschreibung, 80)}}
     </p>
 
-    <!-- Link am Boden -->
     <div>
-        <a href="{{ route('projekte.details', $id) }}" class="text-cyan-600 font-medium text-sm hover:underline">
+        {{-- Link zur Diskussionsseite --}}
+        <a href="/projekt/{{ $projektId }}" class="text-[#0066cc] font-medium text-sm hover:underline">
             Details ansehen &rarr;
         </a>
     </div>
