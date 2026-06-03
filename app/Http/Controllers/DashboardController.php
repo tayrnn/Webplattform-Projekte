@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+<<<<<<< HEAD
 use App\Models\Project;
+=======
+use App\Models\Projekt\Projekt;
+>>>>>>> origin/feature/kommentare-diskussionen
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -18,7 +22,7 @@ class DashboardController extends Controller
 
     public function lehrendeDashboard()
     {
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('lehrende.dashboard', compact('projekte'));
     }
 
@@ -26,13 +30,13 @@ class DashboardController extends Controller
     // lädt zum Testen vorerst auch das Dashboard, soll aber später die betreuten Projekte anzeigen 
     public function lehrendeAlleProjekte()
     {
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('lehrende.dashboard', compact('projekte'));
     }
 
     public function lehrendeBetreuteProjekte()
     {
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('lehrende.dashboard', compact('projekte'));
     }
 
@@ -41,20 +45,20 @@ class DashboardController extends Controller
 
     public function studentDashboard()
     {
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('student.dashboard', compact('projekte'));
     }
 
     // dopplte Aufruf des gleichen Views (s. studentDashboard()) -> soll das wirklich doppelt sein, nur mit anderer Route?
     public function studentAlleProjekte()
     {
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('student.dashboard', compact('projekte'));
     }
 
     public function studentMeineProjekte() 
     {
-        $projekte= Project::where('ersteller_id', Auth::id())->get();
+        $projekte= Projekt::where('ersteller_id', Auth::id())->get();
         return view('student.dashboard', compact('projekte'));
     }
 
@@ -69,14 +73,14 @@ class DashboardController extends Controller
 
     public function adminDashboard()
     {
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('admin.dashboard', compact('projekte'));
     }
 
     public function adminNutzerverwaltung()
     {
         // hier kommt später eine Tabelle mit allen Nutzern hin -> anzeigen lassen
-        $projekte = Project::all();
+        $projekte = Projekt::all();
         return view('admin.dashboard', compact('projekte'));
     }
 

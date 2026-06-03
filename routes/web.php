@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BetreuungController;
 use App\Http\Controllers\ProfileController;
 
+use App\Http\Controllers\DiskussionController;
 
 // Startseite
 Route::get('/dashboard', function () {
@@ -127,3 +128,16 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 // abmelden button (einstellung)
 Route::post('/abmelden', [AuthenticatedSessionController::class, 'destroy'])->name('abmelden');
+
+
+// Diskussionen
+Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])
+    ->name('diskussion.create');
+Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])
+    ->name('diskussion.speichern');
+Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])
+    ->name('diskussion.details');
+Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])
+    ->name('diskussion.antworten');
+Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])
+    ->name('diskussion.abstimmen');

@@ -3,6 +3,8 @@
 namespace App\Models\Projekt;
 
 use App\Models\Nutzer\Nutzer;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bewertung extends Model {
 
