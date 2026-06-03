@@ -6,6 +6,8 @@ use App\Http\Controllers\ProjektController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\BetreuungController;
+
 
 // Startseite
 Route::get('/dashboard', function () {
@@ -52,6 +54,15 @@ Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisi
 // Projekt loeschen (nur eigene Idee)
 Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
 
+Route::get('/lehrende/betreute-projekte', [BetreuungController::class, 'index']);
+
+Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class, 'uebernehmen'])
+    ->name('betreuung.uebernehmen');
+
+Route::post('/projekte/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])
+    ->name('betreuung.beenden');
+    
+
 // Test-Route (von Taqwa)
 Route::get('/test', function () {
     return view('test');
@@ -65,7 +76,7 @@ Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
 
 // Tab 1: Alle Ideen (lädt die normale Übersicht)
 Route::get('/student/alle-ideen', function () {
-   $projekte = Project::all();
+    $projekte = Project::all();
     return view('student.dashboard', compact('projekte'));
 });
 
@@ -89,7 +100,7 @@ Route::get('/lehrende/alle-ideen', function () {
 Route::get('/lehrende/betreute-projekte', function () {
     $projekte = Project::all();
     return view('lehrende.dashboard', compact('projekte'));
-}); 
+});
 // 2. Admin Nutzerverwaltung (Übersicht aller Nutzer)
 Route::get('/admin/nutzer', function () {
     // Hier kann später eine Tabelle mit allen Nutzern anzeigen lassen

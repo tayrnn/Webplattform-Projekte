@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Prototyp I: grundlegende Nutzertabelle
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');

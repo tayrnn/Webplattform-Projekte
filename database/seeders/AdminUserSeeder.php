@@ -24,7 +24,14 @@ class AdminUserSeeder extends Seeder
             'email' => 'student@test.local',
             'password' => Hash::make('student12345'),
             'role' => 'student',
+        ]);
 
-]);
+        User::create([
+            'name' => 'Test Lehrer',
+            'username' => 'lehrer1',
+            'email' => 'lehrer@test.local',
+            'password' => Hash::make('lehrer12345'),
+            'role' => 'lehrende',
+        ]);
     }
 }
