@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('projects', function (Blueprint $table) {
-            $table->boolean('is_public')->default(true);
+            $table->boolean('is_public')->default(true)->after('bearbeitungsstatus');
         });
     }
 

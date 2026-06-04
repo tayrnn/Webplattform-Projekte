@@ -13,21 +13,21 @@ class ProjektSeeder extends Seeder
             'projektname' => 'StudyBuddy',
             'beschreibung' => 'Plattform zum Finden von Lernpartnern für Studierende.',
             'bearbeitungsstatus' => 'offen',
-            'ersteller_id' => 2,
+            'user_id' => 2,
         ]);
 
         Projekt::create([
             'projektname' => 'CampusConnect',
             'beschreibung' => 'Digitale Plattform für Projektideen und Zusammenarbeit.',
             'bearbeitungsstatus' => 'in_bearbeitung',
-            'ersteller_id' => 2,
+            'user_id' => 2,
         ]);
 
         Projekt::create([
             'projektname' => 'Smart Library',
             'beschreibung' => 'System zur intelligenten Verwaltung von Bibliotheksplätzen.',
             'bearbeitungsstatus' => 'offen',
-            'ersteller_id' => 2,
+            'user_id' => 2,
         ]);
     }
 }

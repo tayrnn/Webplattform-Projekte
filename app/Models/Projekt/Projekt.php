@@ -4,6 +4,7 @@ namespace App\Models\Projekt;
 
 use App\Models\Nutzer\Nutzer;
 use App\Models\Projekt\Bewertung;
+use App\Models\Projekt\Kategorie;
 use App\Models\Diskussion\Diskussion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
