@@ -106,7 +106,6 @@
                             </button>
                         </form>
                     </div>
-                    @endif
 
                     {{-- Projektdetails --}}
                     <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
@@ -158,8 +157,8 @@
                 </div>
 
             </div>
-
         </section>
     </div>
 </div>
+@endif
 @endsection

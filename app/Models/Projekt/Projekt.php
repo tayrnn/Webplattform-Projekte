@@ -2,8 +2,9 @@
 
 namespace App\Models\Projekt;
 
-use app\Models\Nutzer\Nutzer;
-
+use App\Models\Nutzer\Nutzer;
+use App\Models\Projekt\Bewertung;
+use App\Models\Diskussion\Diskussion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,7 @@ class Projekt extends Model
         'beschreibung',
         'bearbeitungsstatus', // offen, geschlossen
         'bildpfad',
+        'mitglied',
         'ersteller_id',
     ];
 
@@ -48,13 +50,13 @@ class Projekt extends Model
     // ein Projekt hat viele Diskussionen
     public function diskussionen(): HasMany
     {
-        return $this->hasMany(Diskussion::class);
+        return $this->hasMany(Diskussion::class, 'project_id');
     }
 
     // ein Projekt hat viele Bewertungen
     public function bewertungen(): HasMany
     {
-        return $this->hasMany(Bewertung::class);
+        return $this->hasMany(Bewertung::class, 'project_id');
     }
 
     // ein Projekt gehört zu vielen Kategorien (n:m Beziehung)

@@ -8,7 +8,7 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BetreuungController;
 use App\Http\Controllers\ProfileController;
-
+use App\Models\Projekt\Kategorie;
 use App\Http\Controllers\DiskussionController;
 
 // Startseite
@@ -32,7 +32,7 @@ Route::get('/admin', function () {
 
 // Studenten-Ansicht
 Route::get('/student', function () {
-    $projekte = Project::where('ersteller_id', Auth::id())->get();
+    $projekte = Project::all();
     return view('student.dashboard', compact('projekte'));
 });
 
@@ -97,25 +97,21 @@ Route::get('/lehrende', function () {
 Route::get('/admin',    function () {
     return view('admin.dashboard');
 });
-Route::get('/student',  function () {
-    return view('student.dashboard');
-});
 
 // --- PROJEKT-DISKUSSION ---
 // Aufruf: /projekt/1  /projekt/2  usw.
-Route::get('/projekt/{id}', function ($id) {
-    return view('projekt.diskussion', ['projektId' => $id]);
-});
+// Route::get('/projekt/{id}', function ($id) { return view('projekt.diskussion', ['projektId' => $id]); });//
 
 // --- STUDENTEN-ROUTEN ---
 Route::get('/student/neue-idee',      function () {
-    return view('student.create-idea');
+    $kategorien = Kategorie::all();
+    return view('projekte.erstellen', compact('kategorien'));
 });
 Route::get('/student/alle-ideen',     function () {
-    return view('student.dashboard');
+    return view('student.dashboard', compact('projekte'));
 });
 Route::get('/student/meine-projekte', function () {
-    return view('student.dashboard');
+    return view('student.dashboard', compact('projekte'));
 });
 Route::get('/student/nutzer/neu',     function () {
     return "Hier entsteht das Formular zum Projekte erstellen!";

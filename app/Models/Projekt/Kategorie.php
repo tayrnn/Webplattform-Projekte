@@ -30,4 +30,6 @@ class Kategorie extends Model
     {
         $this->name = $name;
     }
+
+    protected $table = 'categories';
 }

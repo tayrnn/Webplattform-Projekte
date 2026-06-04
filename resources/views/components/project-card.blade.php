@@ -39,7 +39,8 @@ default => ['bg' => 'bg-gray-100 text-gray-500', 'label' => $status],
 
     <div>
         {{-- Link zur Diskussionsseite --}}
-        <a href="/projekt/{{ $projektId }}" class="text-[#0066cc] font-medium text-sm hover:underline">
+        <a href="{{ route('projekte.details', $projektId) }}"
+            class="text-[#0066cc] font-medium text-sm hover:underline">
             Details ansehen &rarr;
         </a>
     </div>

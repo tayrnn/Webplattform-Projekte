@@ -16,17 +16,25 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Nutzer extends Authenticatable {
-   
+class Nutzer extends Authenticatable
+{
+
     // /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
-    
+
+    protected $table = 'users';
+
     protected $fillable = [
-        'benutzername', 'passwort', 'email', 'rolle', 'registrierungsDatum'
+        'benutzername',
+        'passwort',
+        'email',
+        'rolle',
+        'registrierungsDatum'
     ];
 
     protected $hidden = [
-        'passwort', 'remember_token'
+        'passwort',
+        'remember_token'
     ];
 
     // guarded = ['id'];
@@ -44,28 +52,38 @@ class Nutzer extends Authenticatable {
             'registrierungsDatum' => 'datetime',
             'rolle' => Rollentyp::class, // Wichtig für den Vergleich mit Enums
         ];
-    } 
+    }
 
-    public function getAuthPassword() {
+    public function ersteller()
+    {
+
+        return $this->belongsTo(Nutzer::class, 'ersteller_id');
+    }
+
+    public function getAuthPassword()
+    {
         return $this->passwort;
     }
-    
-    public function selbstLoeschen(){
+
+    public function selbstLoeschen()
+    {
         // === -> Wert und Datentyp müssen gleich sein
-        if ($this->rolle === Rollentyp::ADMIN){
+        if ($this->rolle === Rollentyp::ADMIN) {
             throw new Exception("Admin kann nicht gelöscht werden!");
         }
         return $this->delete();
     }
 
-    public function nutzerLoeschen(Nutzer $nutzer): bool {
+    public function nutzerLoeschen(Nutzer $nutzer): bool
+    {
         if ($nutzer->rolle === Rollentyp::ADMIN) {
             throw new Exception("Admin kann nicht gelöscht werden!");
         }
         return $nutzer->delete();
     }
 
-    public function isAdmin(): bool {
+    public function isAdmin(): bool
+    {
         return $this->rolle === Rollentyp::ADMIN;
     }
     // if ($this->isAdmin()) { ... }
