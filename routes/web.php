@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NutzerController;
 use App\Http\Controllers\ProjektController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
@@ -107,3 +108,10 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store']);
 
 // abmelden button (einstellung)
 Route::post('/abmelden', [AuthenticatedSessionController::class, 'destroy'])->name('abmelden');
+
+// mein profil
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+});
