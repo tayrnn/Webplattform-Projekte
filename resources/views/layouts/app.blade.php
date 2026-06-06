@@ -40,15 +40,33 @@
                 </div>
             </a>
 
-            <div class="relative w-[320px]">
-                <input type="search" placeholder="Suche..."
+            @php
+                $zielRoute = $homeUrl; // Standardmäßig auf die Startseite setzen
+                if (Auth::check()) {
+                    $rolle = Auth::user()->role;
+                    if ($rolle === 'admin') {
+                        //anhand der URL unterscheiden, ob normale Suche oder Nutzer-Suche für den Admin in der Nutzerverwaltung
+                        $istAdminNutzerverwaltung = request()->is('admin/nutzer');
+                        $zielRoute = $istAdminNutzerverwaltung ? route('admin.nutzer.suchen') : route('admin.projekte.suchen');
+                    } elseif ($rolle === 'lehrender') {
+                        $zielRoute = route('lehrende.projekte.suchen');
+                    } elseif ($rolle === 'student') {
+                        $zielRoute = route('student.projekte.suchen');
+                    } else {
+                        $zielRoute = $homeUrl;
+                    }
+                }
+            @endphp
+
+            <form action="{{ $zielRoute }}" method="GET" class="relative w-[320px]">
+                <input type="search" name="suche" placeholder="Suche..." value="{{ request('suche') }}"
                     class="w-full bg-white rounded-full pl-9 pr-4 py-1.5 text-sm border-none shadow-sm focus:ring-2 focus:ring-blue-400 outline-none">
                 <svg class="absolute left-3 top-2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-            </div>
+            </form>
 
             <div class="flex items-center gap-4">
                 {{-- Einstellungen Dropdown --}}

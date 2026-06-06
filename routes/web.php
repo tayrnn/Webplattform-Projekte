@@ -10,6 +10,7 @@ use App\Http\Controllers\BetreuungController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Projekt\Kategorie;
 use App\Http\Controllers\DiskussionController;
+use App\Http\Controllers\SuchenFilternController;
 
 // Startseite
 Route::get('/dashboard', function () {
@@ -108,9 +109,11 @@ Route::get('/student/neue-idee',      function () {
     return view('projekte.erstellen', compact('kategorien'));
 });
 Route::get('/student/alle-ideen',     function () {
+    $projekte = Projekt::all();
     return view('student.dashboard', compact('projekte'));
 });
 Route::get('/student/meine-projekte', function () {
+    $projekte = Projekt::where('ersteller_id', Auth::id())->get();
     return view('student.dashboard', compact('projekte'));
 });
 Route::get('/student/nutzer/neu',     function () {
@@ -182,3 +185,11 @@ Route::get('/admin/nutzer',     function () {
 Route::get('/admin/nutzer/neu', function () {
     return "Hier entsteht das Formular zum Nutzer anlegen!";
 });
+
+// --- SUCH-ROUTEN ---
+
+//Anpassungen an die jeweiligen unterschiedlichen Ansichten noch!!!!!!!!!!!!!!!!!
+Route::get('/student/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('student.projekte.suchen');
+Route::get('/lehrende/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.projekte.suchen');
+Route::get('/admin/projektideen/suchen', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
+Route::get('/admin/nutzer/suchen', [SuchenFilternController::class, 'nachNutzernSuchen'])->name('admin.nutzer.suchen');
