@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Project;
-use App\Models\Category;
+use App\Models\Projekt\Projekt;
+use App\Models\Projekt\Kategorie;
 use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller

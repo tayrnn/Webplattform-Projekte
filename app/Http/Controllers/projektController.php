@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller
 {
-    // Alle Projekte anzeigen (mit Filter nach Status)
+    // Alle Projekte anzeigen (mit Filer nach Status)
     public function liste(Request $request)
     {
         $filterKategorie = $request->input('filterKategorie');
