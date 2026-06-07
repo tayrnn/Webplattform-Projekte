@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Project;
-use App\Models\Category;
+use App\Models\Projekt\Projekt;
+use App\Models\Projekt\Kategorie;
 use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller
@@ -15,7 +15,7 @@ class ProjektController extends Controller
         $filterKategorie = $request->input('filterKategorie');
         $filterStatus    = $request->input('filterStatus');
 
-        $projekte = Project::with(['user', 'category'])
+        $projekte = Projekt::with(['ersteller', 'kategorien'])
             ->where(function ($query) {
                 // Oeffentliche Projekte fuer alle sichtbar
                 $query->where('is_public', true)
@@ -26,11 +26,13 @@ class ProjektController extends Controller
                     });
             })
             ->when($filterStatus,    fn($q) => $q->where('bearbeitungsstatus', $filterStatus))
-            ->when($filterKategorie, fn($q) => $q->where('category_id', $filterKategorie))
+            ->when($filterKategorie, fn($q) => $q->whereHas('kategorien', function ($sq) use ($filterKategorie) {
+                $sq->where('id', $filterKategorie);
+            }))
             ->latest()
             ->get();
 
-        $kategorien   = Category::all();
+        $kategorien   = Kategorie::all();
         $istStudent   = Auth::check() && Auth::user()->role === 'student';
         $istLehrender = Auth::check() && Auth::user()->role === 'lehrender';
         $istAdmin     = Auth::check() && Auth::user()->role === 'admin';
@@ -50,12 +52,12 @@ class ProjektController extends Controller
     public function meine(Request $request)
     {
         // Zeigt ALLE eigenen Projekte (privat + oeffentlich)
-        $projekte = Project::with(['user', 'category'])
+        $projekte = Projekt::with(['ersteller', 'kategorien'])
             ->where('ersteller_id', Auth::id())
             ->latest()
             ->get();
 
-        $kategorien      = Category::all();
+        $kategorien      = Kategorie::all();
         $filterKategorie = null;
         $filterStatus    = null;
         $istStudent      = true;
@@ -76,7 +78,7 @@ class ProjektController extends Controller
     // Formular fuer neue Projektidee anzeigen
     public function erstellen()
     {
-        $kategorien = Category::all();
+        $kategorien = Kategorie::all();
         $istStudent = Auth::check() && Auth::user()->role === 'student';
 
         return view('projekte.erstellen', compact('kategorien', 'istStudent'));
@@ -91,7 +93,7 @@ class ProjektController extends Controller
         ]);
 
         // Projekt erstellen - Status wird automatisch auf "neu" gesetzt
-        Project::create([
+        Projekt::create([
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => 'neu',
@@ -107,7 +109,7 @@ class ProjektController extends Controller
     // Ein Projekt anzeigen
     public function details($id)
     {
-        $projekt = Project::with(['user', 'category'])->findOrFail($id);
+        $projekt = Projekt::with(['ersteller'])->findOrFail($id);
 
         // Sicherheitspruefung: Private Projekte nur fuer Ersteller sichtbar
         if (!$projekt->is_public && $projekt->ersteller_id !== Auth::id()) {
@@ -130,7 +132,7 @@ class ProjektController extends Controller
     // Bearbeitungs-Formular anzeigen (nur fuer eigene Idee)
     public function bearbeiten($id)
     {
-        $projekt = Project::findOrFail($id);
+        $projekt = Projekt::findOrFail($id);
 
         // Sicherheitspruefung: nur der Ersteller darf bearbeiten
         if ($projekt->ersteller_id !== Auth::id()) {
@@ -138,7 +140,7 @@ class ProjektController extends Controller
                 ->with('fehler', 'Du kannst nur deine eigenen Ideen bearbeiten.');
         }
 
-        $kategorien = Category::all();
+        $kategorien = Kategorie::all();
         $istStudent = true;
 
         return view('projekte.bearbeiten', compact('projekt', 'kategorien', 'istStudent'));
@@ -147,7 +149,7 @@ class ProjektController extends Controller
     // Projekt aktualisieren
     public function aktualisieren(Request $request, $id)
     {
-        $projekt = Project::findOrFail($id);
+        $projekt = Projekt::findOrFail($id);
 
         // Sicherheitspruefung
         if ($projekt->ersteller_id !== Auth::id()) {
@@ -173,7 +175,7 @@ class ProjektController extends Controller
     // Projekt loeschen (Student: nur eigene / Admin: alle)
     public function loeschen($id)
     {
-        $projekt = Project::findOrFail($id);
+        $projekt = Projekt::findOrFail($id);
 
         $istAdmin = Auth::check() && Auth::user()->role === 'admin';
 
