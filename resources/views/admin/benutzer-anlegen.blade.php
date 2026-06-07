@@ -13,12 +13,14 @@
             padding: 40px;
         }
 
-        .container{
-            width: 500px;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-        }
+.container{
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
 
         input{
             width: 100%;
@@ -37,6 +39,24 @@
         h2{
             margin-bottom: 30px;
         }
+        @media (max-width: 768px){
+
+    body{
+        padding: 15px;
+    }
+
+    .container{
+        padding: 20px;
+    }
+
+    h2{
+        font-size: 24px;
+    }
+
+    button{
+        width: 100%;
+    }
+}
     </style>
 </head>
 

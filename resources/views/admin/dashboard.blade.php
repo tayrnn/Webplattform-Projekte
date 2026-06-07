@@ -12,14 +12,15 @@
     Platzhalter für Admin-Inhalte
 </p>
 
-<div class="mt-4">
+<div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">
     <button>Benutzer löschen</button>
 
     <button>Benutzer sperren</button>
 </div>
 
 <div class="mt-6 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg">
-    <table border="1" cellpadding="10">
+    <div style="overflow-x:auto;">
+    <table border="1" cellpadding="10" style="width:100%;">
     <tr>
         <th>Vorname</th>
         <th>Nachname</th>
