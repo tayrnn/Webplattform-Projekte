@@ -41,21 +41,21 @@
             </a>
 
             @php
-                $zielRoute = $homeUrl; // Standardmäßig auf die Startseite setzen
-                if (Auth::check()) {
-                    $rolle = Auth::user()->role;
-                    if ($rolle === 'admin') {
-                        //anhand der URL unterscheiden, ob normale Suche oder Nutzer-Suche für den Admin in der Nutzerverwaltung
-                        $istAdminNutzerverwaltung = request()->is('admin/nutzer');
-                        $zielRoute = $istAdminNutzerverwaltung ? route('admin.nutzer.suchen') : route('admin.projekte.suchen');
-                    } elseif ($rolle === 'lehrender') {
-                        $zielRoute = route('lehrende.projekte.suchen');
-                    } elseif ($rolle === 'student') {
-                        $zielRoute = route('student.projekte.suchen');
-                    } else {
-                        $zielRoute = $homeUrl;
-                    }
-                }
+            $zielRoute = $homeUrl; // Standardmäßig auf die Startseite setzen
+            if (Auth::check()) {
+            $rolle = Auth::user()->role;
+            if ($rolle === 'admin') {
+            //anhand der URL unterscheiden, ob normale Suche oder Nutzer-Suche für den Admin in der Nutzerverwaltung
+            $istAdminNutzerverwaltung = request()->is('admin/nutzer');
+            $zielRoute = $istAdminNutzerverwaltung ? route('admin.nutzer.suchen') : route('admin.projekte.suchen');
+            } elseif ($rolle === 'lehrender') {
+            $zielRoute = route('lehrende.projekte.suchen');
+            } elseif ($rolle === 'student') {
+            $zielRoute = route('student.projekte.suchen');
+            } else {
+            $zielRoute = $homeUrl;
+            }
+            }
             @endphp
 
             <form action="{{ $zielRoute }}" method="GET" class="relative w-[320px]">

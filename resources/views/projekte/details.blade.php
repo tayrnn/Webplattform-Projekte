@@ -1,5 +1,5 @@
 {{-- projekte/details.blade.php --}}
-{{-- Detailansicht einer Projektidee - Prototyp I --}}
+{{-- Detailansicht einer Projektidee --}}
 
 @extends('layouts.app')
 

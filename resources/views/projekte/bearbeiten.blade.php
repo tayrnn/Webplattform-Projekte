@@ -1,4 +1,3 @@
-cat > /home/claude/bearbeiten.blade.php << 'EOF'
 {{-- projekte/bearbeiten.blade.php --}}
 {{-- Formular fuer Studierende um eigene Projektidee zu bearbeiten --}}
 
@@ -100,6 +99,28 @@ cat > /home/claude/bearbeiten.blade.php << 'EOF'
                         @enderror
                     </div>
 
+                    {{-- Privat oder Öffentlich --}}
+                    <div class="mb-5">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                            Sichtbarkeit
+                        </label>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="is_public" value="1"
+                                {{ old('is_public', $projekt->is_public) == 1 ? 'checked' : '' }}
+                                class="text-blue-600">
+                                <span class="text-sm text-gray-700">🌐 Öffentlich</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="is_public" value="0"
+                                {{ old('is_public', $projekt->is_public) == 0 ? 'checked' : '' }}
+                                class="text-blue-600">
+                                <span class="text-sm text-gray-700">🔒 Privat</span>
+                            </label>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Privat: nur du kannst es sehen</p>
+                    </div>
+                    
                     {{-- Buttons --}}
                     <div class="flex gap-3 mt-6">
                         <button type="submit"
@@ -119,4 +140,3 @@ cat > /home/claude/bearbeiten.blade.php << 'EOF'
     </div>
 </div>
 @endsection
-EOF

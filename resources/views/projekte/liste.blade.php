@@ -1,5 +1,5 @@
 {{-- projekte/liste.blade.php --}}
-{{-- Zeigt alle Projektideen mit Taqwas Design und echten Datenbankdaten --}}
+{{-- Zeigt alle Projektideen --}}
 
 @extends('layouts.app')
 
