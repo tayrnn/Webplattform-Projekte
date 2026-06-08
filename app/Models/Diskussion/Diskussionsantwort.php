@@ -14,20 +14,19 @@ class Diskussionsantwort extends Model
     protected $fillable = [
         'discussion_id', 
         'user_id', 
-        'content', 
-        'ist_umfrage'
-    ];
-
-    protected $casts = [
-        'ist_umfrage' => 'boolean',
+        'content',
+        'parent_id' // NULL -> Hauptkommentar, sonst Antwort
     ];
 
     /**
-     * Der Nutzer, der diesen Beitrag verfasst hat.
+     * Der Nutzer, der diese Antwort verfasst hat.
      */
     public function ersteller(): BelongsTo
     {
-        return $this->belongsTo(Nutzer::class, 'user_id');
+        return $this->belongsTo(Nutzer::class, 'user_id')
+        ->withDefault([
+            'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
+        ]);
     }
 
     /**
@@ -39,26 +38,11 @@ class Diskussionsantwort extends Model
     }
 
     /**
-     * Die Antwortoptionen, falls dieser Beitrag eine Umfrage ist.
+     * Alle Antworten, die auf diese Antwort antworten.
      */
-    public function umfrageOptionen(): HasMany
+    public function unterantworten(): HasMany
     {
-        return $this->hasMany(UmfrageOption::class, 'discussion_answer_id');
-    }
-
-    /**
-     * Alle abgegebenen Stimmen für diese spezifische Umfrage.
-     */
-    public function stimmen(): HasMany
-    {
-        return $this->hasMany(UmfrageStimme::class, 'discussion_answer_id');
-    }
-    
-    /**
-     * Hilfsmethode: Prüfen, ob ein bestimmter Nutzer bereits abgestimmt hat.
-     */
-    public function hatNutzerAbgestimmt($nutzerId): bool
-    {
-        return $this->stimmen()->where('user_id', $nutzerId)->exists();
+        return $this->hasMany(self::class, 'parent_id')
+            ->orderBy('created_at', 'asc');
     }
 }

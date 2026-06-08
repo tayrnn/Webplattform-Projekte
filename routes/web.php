@@ -9,7 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BetreuungController;
 use App\Http\Controllers\ProfileController;
 use App\Models\Projekt\Kategorie;
-use App\Http\Controllers\DiskussionController;
+use App\Http\Controllers\DiskussionenController;
+use App\Http\Controllers\UmfrageController;
+use App\Http\Controllers\BewertungsController;
 
 // Startseite
 Route::get('/dashboard', function () {
@@ -101,6 +103,25 @@ Route::get('/admin',    function () {
 // --- PROJEKT-DISKUSSION ---
 // Aufruf: /projekt/1  /projekt/2  usw.
 // Route::get('/projekt/{id}', function ($id) { return view('projekt.diskussion', ['projektId' => $id]); });//
+// --- NEUE PROJEKT-DETAILANSICHT MIT DISKUSSION, UMFRAGE & STERNEN ---
+
+// 1. Das kombinierte Frontend-Layout (Hauptseite)
+    Route::get('/projekt/{id}/diskussionen', [DiskussionenController::class, 'anzeigen'])->name('projekt.diskussionen');
+
+    // 2. Diskussionen & Kommentare
+    Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionenController::class, 'diskussionSpeichern'])->name('diskussion.speichern');
+    Route::post('/projekt/{diskussion}/beitrag', [DiskussionenController::class, 'beitragSpeichern'])->name('beitrag.speichern');
+    Route::post('/beitrag/{beitrag}/antwort', [DiskussionenController::class, 'antwortSpeichern'])->name('antwort.speichern');
+    Route::delete('/beitrag/{id}/loeschen', [DiskussionenController::class, 'beitragLoeschen'])->name('beitrag.loeschen');
+    Route::delete('/projekt/{projektId}/diskussion/loeschen', [DiskussionenController::class, 'diskussionLoeschen'])->name('diskussion.loeschen');
+
+    // 3. Umfragen
+    Route::post('/projekt/{projektId}/abstimmen', [UmfrageController::class, 'abstimmen'])->name('umfrage.abstimmen');
+    Route::delete('/projekt/{projektId}/stimme-zurueckziehen', [UmfrageController::class, 'stimmeLoeschen'])->name('umfrage.loeschen');
+
+    // 4. Sternebewertungen
+    Route::post('/projekt/{projektId}/bewerten', [BewertungsController::class, 'bewerten'])->name('bewertung.speichern');
+    Route::delete('/projekt/{projektId}/bewertung-entfernen', [BewertungsController::class, 'bewertungLoeschen'])->name('bewertung.loeschen');
 
 // --- STUDENTEN-ROUTEN ---
 Route::get('/student/neue-idee',      function () {
@@ -156,11 +177,11 @@ Route::post('/abmelden', [AuthenticatedSessionController::class, 'destroy'])->na
 
 
 // Diskussionen
-Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])
+Route::get('/projekte/{projekt}/diskussion/create', [DiskussionenController::class, 'create'])
     ->name('diskussion.create');
-Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])
+Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionenController::class, 'speichern'])
     ->name('diskussion.speichern');
-Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])
+Route::get('/diskussion/{diskussion}', [DiskussionenController::class, 'details'])
     ->name('diskussion.details');
 Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])
     ->name('diskussion.antworten');

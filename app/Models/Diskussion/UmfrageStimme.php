@@ -4,6 +4,7 @@ namespace App\Models\Diskussion;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Diskussion\Umfrage;
 use App\Models\Nutzer\Nutzer;
 
 class UmfrageStimme extends Model
@@ -11,17 +12,17 @@ class UmfrageStimme extends Model
     protected $table = 'poll_votes';
 
     protected $fillable = [
-        'discussion_answer_id', 
+        'poll_id',
         'user_id', 
         'poll_option_id'
     ];
 
     /**
-     * Der Diskussionsbeitrag (die Umfrage), in dem abgestimmt wurde.
+     * Die Umfrage, für die diese Stimme abgegeben wurde.
      */
-    public function diskussionsantwort(): BelongsTo
+    public function umfrage(): BelongsTo
     {
-        return $this->belongsTo(Diskussionsantwort::class, 'discussion_answer_id');
+        return $this->belongsTo(Umfrage::class, 'poll_id');
     }
 
     /**
