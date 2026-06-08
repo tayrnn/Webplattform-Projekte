@@ -114,7 +114,7 @@
             <p class="text-xs text-gray-400 uppercase tracking-wide mb-3">Projektbewertung</p>
 
             <div class="flex items-center gap-3 flex-wrap">
-                {{-- Durchschnitt (kompakt) --}}
+                {{-- Durchschnitt --}}
                 <span class="text-base font-semibold text-gray-800">
                     {{ number_format($durchschnitt ?? 0, 1, ',', '') }} Ø
                 </span>
@@ -141,7 +141,7 @@
                         @endfor
                     </div>
 
-                    {{-- Speichern-Button erscheint nur nach Auswahl --}}
+                    {{-- Speichern-Button --}}
                     <form action="{{ route('projekte.bewerten', $projekt->id) }}" method="POST"
                           x-show="selected > 0 && !saved" style="display:none">
                         @csrf
@@ -173,7 +173,7 @@
     {{-- ── 2-Spalten: Diskussionen + Umfragen ── --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
-        {{-- Diskussionen --}}
+        {{-- Linke Spalte: Diskussionen --}}
         <div>
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
                 <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -184,30 +184,88 @@
             </h2>
 
             @forelse($projekt->diskussionen ?? [] as $diskussion)
-            <a href="{{ route('diskussion.details', $diskussion->id) }}"
-               class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-2 hover:border-blue-300 transition-colors group">
-                <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold uppercase flex-shrink-0"
-                     style="background:#E6F1FB;color:#0C447C">
-                    {{ substr($diskussion->ersteller->name ?? 'NA', 0, 2) }}
+            {{-- Alpine für Bearbeiten und Schnellantwort --}}
+            <div x-data="{ editDiscussion: false, zeigeAntwortBox: false }" class="bg-white border border-gray-200 rounded-xl px-4 py-3 mb-2 hover:border-blue-300 transition-colors">
+                
+                <div x-show="!editDiscussion" class="flex items-center gap-3">
+                    <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold uppercase flex-shrink-0"
+                         style="background:#E6F1FB;color:#0C447C">
+                        {{ substr($diskussion->ersteller->name ?? 'NA', 0, 2) }}
+                    </div>
+                    
+                    <a href="{{ route('diskussion.details', $diskussion->id) }}" class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-800 truncate hover:text-blue-600 transition">{{ $diskussion->title }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            {{ $diskussion->ersteller->name ?? '–' }}
+                            · {{ $diskussion->created_at->diffForHumans() }}
+                            · {{ $diskussion->antworten_count ?? 0 }} Antworten
+                        </p>
+                    </a>
+                    
+                    {{-- Edit/Delete Optionen für eigene Diskussionen – immer sichtbar --}}
+                    @if(auth()->id() === $diskussion->user_id)
+                    <div class="flex flex-col items-end gap-1">
+                        <button @click="editDiscussion = true" class="text-[10px] text-gray-400 hover:text-blue-600">✎ Bearbeiten</button>
+                        <form action="{{ route('diskussion.loeschen', $diskussion->id) }}" method="POST" onsubmit="return confirm('Thema wirklich löschen?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-[10px] text-gray-400 hover:text-red-600">🗑 Löschen</button>
+                        </form>
+                    </div>
+                    @endif
                 </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-800 truncate">{{ $diskussion->title }}</p>
-                    <p class="text-xs text-gray-400 mt-0.5">
-                        {{ $diskussion->ersteller->name ?? '–' }}
-                        · {{ $diskussion->created_at->diffForHumans() }}
-                        · {{ $diskussion->antworten_count ?? 0 }} Antworten
-                    </p>
+
+                {{-- Edit Formular --}}
+                <div x-show="editDiscussion" x-collapse>
+                    <form action="{{ route('diskussion.bearbeiten', $diskussion->id) }}" method="POST" class="mt-2">
+                        @csrf
+                        @method('PUT')
+                        <textarea name="title" rows="2" class="w-full text-sm border border-gray-200 rounded-lg px-2 py-1 mb-2">{{ $diskussion->title }}</textarea>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" @click="editDiscussion = false" class="text-xs text-gray-500 hover:bg-gray-100 px-2 py-1 rounded">Abbrechen</button>
+                            <button type="submit" class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Speichern</button>
+                        </div>
+                    </form>
                 </div>
-                <svg class="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 transition-colors"
-                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                </svg>
-            </a>
+
+                {{-- Schnellantwort-Bereich --}}
+                <div class="mt-2 pt-2 border-t border-gray-50">
+                    <button @click="zeigeAntwortBox = !zeigeAntwortBox" 
+                            class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors font-medium">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                        </svg>
+                        Schnellantwort
+                    </button>
+
+                    <div x-show="zeigeAntwortBox" x-collapse class="mt-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                        <form action="{{ route('diskussion.antworten', $diskussion->id) }}" method="POST">
+                            @csrf
+                            <textarea name="beitrag" 
+                                      rows="2" 
+                                      required
+                                      placeholder="Schreibe deine Antwort auf dieses Thema..."
+                                      class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 resize-none"></textarea>
+                            
+                            <div class="flex justify-end gap-2 mt-2">
+                                <button type="button" 
+                                        @click="zeigeAntwortBox = false"
+                                        class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-200 rounded transition">
+                                    Abbrechen
+                                </button>
+                                <button type="submit" 
+                                        class="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700 transition">
+                                    Senden
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
             @empty
             <p class="text-sm text-gray-400 mb-3">Noch keine Diskussionen.</p>
             @endforelse
 
-            {{-- Neues Thema --}}
+            {{-- Neues Thema erstellen --}}
             <div class="bg-white border border-gray-200 rounded-xl p-4 mt-2"
                  x-data="{ istUmfrage: false, optionen: ['',''], text: '' }">
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Neues Diskussionsthema erstellen</p>
@@ -258,7 +316,7 @@
             </div>
         </div>
 
-        {{-- Umfragen --}}
+        {{-- Rechte Spalte: Umfragen --}}
         <div>
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
                 <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
