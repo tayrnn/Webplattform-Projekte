@@ -13,14 +13,16 @@ use Illuminate\Support\Facades\DB;
 
 class DiskussionController extends Controller
 {
-    public function create(Projekt $projekt) {
+    public function create(Projekt $projekt)
+    {
         return view('diskussion.create', compact('projekt'));
     }
 
     /**
      * Erstellt nur das übergeordnete Diskussionsthema (ohne Beitrag).
      */
-    public function speichern(Request $request, Projekt $projekt) {
+    public function speichern(Request $request, Projekt $projekt)
+    {
         // Da kein Beitrag erstellt wird, brauchen wir nur den Titel
         $request->validate([
             'titel' => 'required|string|max:255',
@@ -41,16 +43,18 @@ class DiskussionController extends Controller
     /**
      * Zeigt den gesamten Thread an.
      */
-    public function details(Diskussion $diskussion) {
-        $diskussion->load(['antworten.ersteller', 'antworten.umfrageOptionen.stimmen', 'projekt']);
-        
-        return view('diskussion.details', compact('diskussion'));
+    public function details(Diskussion $diskussion)
+    {
+        $diskussion->load(['antworten.ersteller', 'projekt']);
+
+        return view('projekte.diskussion-details', compact('diskussion'));
     }
 
     /**
      * Route zum Abstimmen auf eine spezifische Umfrage
      */
-    public function abstimmen(Request $request, $antwortId) {
+    public function abstimmen(Request $request, $antwortId)
+    {
         $request->validate([
             'option_id' => 'required|exists:poll_options,id'
         ]);
@@ -59,7 +63,7 @@ class DiskussionController extends Controller
 
         if ($antwort->hatNutzerAbgestimmt(auth()->id())) {
             return redirect()->back()->with('fehler', 'Du hast bereits abgestimmt.');
-        }  
+        }
 
         UmfrageStimme::create([
             'discussion_answer_id' => $antwort->id,
@@ -73,7 +77,8 @@ class DiskussionController extends Controller
     /**
      * Erstellt eine Antwort oder eine Umfrage innerhalb des Threads.
      */
-    public function antworten(Request $request, Diskussion $diskussion) {
+    public function antworten(Request $request, Diskussion $diskussion)
+    {
         $request->validate([
             'beitrag'     => 'required|string',
             'ist_umfrage' => 'nullable|boolean',

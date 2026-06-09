@@ -5,16 +5,16 @@ namespace App\Models\Diskussion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Nutzer\Nutzer;
+use App\Models\User;
 
 class Diskussionsantwort extends Model
 {
     protected $table = 'discussion_answers';
 
     protected $fillable = [
-        'discussion_id', 
-        'user_id', 
-        'content', 
+        'discussion_id',
+        'user_id',
+        'content',
         'ist_umfrage'
     ];
 
@@ -27,7 +27,7 @@ class Diskussionsantwort extends Model
      */
     public function ersteller(): BelongsTo
     {
-        return $this->belongsTo(Nutzer::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
@@ -53,7 +53,7 @@ class Diskussionsantwort extends Model
     {
         return $this->hasMany(UmfrageStimme::class, 'discussion_answer_id');
     }
-    
+
     /**
      * Hilfsmethode: Prüfen, ob ein bestimmter Nutzer bereits abgestimmt hat.
      */

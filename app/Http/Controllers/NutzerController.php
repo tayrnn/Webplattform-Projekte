@@ -36,4 +36,20 @@ class NutzerController extends Controller
         return redirect('/admin/nutzer/neu')
             ->with('success', 'Benutzer wurde erstellt. Temporäres Passwort: ' . $temporaryPassword);
     }
+
+    public function loeschen($id)
+    {
+        $nutzer = User::findOrFail($id);
+
+        // Admin kann sich nicht selbst löschen
+        if ($nutzer->id === auth()->id()) {
+            return redirect('/admin/nutzer')
+                ->with('fehler', 'Du kannst dich nicht selbst löschen.');
+        }
+
+        $nutzer->delete();
+
+        return redirect('/admin/nutzer')
+            ->with('erfolg', 'Nutzer wurde gelöscht.');
+    }
 }

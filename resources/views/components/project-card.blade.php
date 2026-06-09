@@ -1,7 +1,9 @@
-@props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'projektId' => 1, 'id'])
+@props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'projektId' => 1, 'id', 'isPublic' =>
+true])
 
 @php
-$statusConfig = match(strtolower($status)) {
+$statusWert = $status instanceof \App\Models\Projekt\Bearbeitungsstatus ? $status->value : ($status ?? 'offen');
+$statusConfig = match(strtolower($statusWert)) {
 'abgeschlossen' => ['bg' => 'bg-gray-100 text-gray-600', 'label' => 'Abgeschlossen'],
 'in bearbeitung', 'in_bearbeitung' => ['bg' => 'bg-blue-100 text-blue-700', 'label' => 'In Bearbeitung'],
 'offen' => ['bg' => 'bg-green-100 text-green-700', 'label' => 'Offen'],
@@ -19,6 +21,18 @@ default => ['bg' => 'bg-gray-100 text-gray-500', 'label' => $status],
         <!-- Linke Seite: Titel und Label -->
         <div class="flex flex-col items-start">
             <h3 class="text-xl font-bold text-[#1a202c]">{{ $title }}</h3>
+
+            @if(!$isPublic)
+            <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-gray-100 text-gray-600 border border-gray-300">
+                🔒 Privat
+            </span>
+            @else
+            <span
+                class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-blue-50 text-blue-600 border border-blue-200">
+                🌐 Öffentlich
+            </span>
+            @endif
 
             @if($needsSupervision)
             <!-- Das gelbe "Sucht Betreuer" Label  -->

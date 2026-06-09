@@ -8,196 +8,140 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\Projekt\Projekt;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BetreuungController;
-use App\Http\Controllers\ProfileController;
 use App\Models\Projekt\Kategorie;
 use App\Http\Controllers\DiskussionController;
 use App\Http\Controllers\SuchenFilternController;
 
-// Startseite
-Route::get('/dashboard', function () {
-    return view('dashboard');
-});
-
-// --- 3 ROLLEN-DASHBOARDS ---
-
-// Lehrende-Ansicht
-Route::get('/lehrende', function () {
-    $projekte = Projekt::all();
-    return view('lehrende.dashboard', compact('projekte'));
-});
-
-// Admin-Ansicht
-Route::get('/admin', function () {
-    $projekte = Projekt::all();
-    return view('admin.dashboard', compact('projekte'));
-});
-
-// Studenten-Ansicht
-Route::get('/student', function () {
-    $projekte = Projekt::all();
-    return view('student.dashboard', compact('projekte'));
-});
-
-// Startseite zeigt die Projektliste
-Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
-
-// Meine Projekte (nur eigene Ideen des eingeloggten Studenten)
-Route::get('/projekte/meine', [ProjektController::class, 'meine'])->name('projekte.meine');
-
-// Projekt erstellen
-Route::get('/projekte/erstellen', [ProjektController::class, 'erstellen'])->name('projekte.erstellen');
-Route::post('/projekte/speichern', [ProjektController::class, 'speichern'])->name('projekte.speichern');
-
-// Projekt Details
-Route::get('/projekte/{id}', [ProjektController::class, 'details'])->name('projekte.details');
-
-// Projekt bearbeiten (nur eigene Idee)
-Route::get('/projekte/{id}/bearbeiten', [ProjektController::class, 'bearbeiten'])->name('projekte.bearbeiten');
-Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisieren'])->name('projekte.aktualisieren');
-
-// Projekt loeschen (nur eigene Idee)
-Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
-
-Route::get('/lehrende/betreute-projekte', [BetreuungController::class, 'index']);
-
-Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class, 'uebernehmen'])
-    ->name('betreuung.uebernehmen');
-
-Route::post('/projekte/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])
-    ->name('betreuung.beenden');
-
-
-// Test-Route (von Taqwa)
-Route::get('/test', function () {
-    return view('test');
-});
-
-// Benutzer anlegen
-Route::get('/admin/nutzer/neu', [NutzerController::class, 'benutzerAnlegen']);
-
-Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
-// --- TAB-ROUTEN FÜR STUDENTEN ---
-
-// Tab 1: Alle Ideen (lädt die normale Übersicht)
-Route::get('/student/alle-ideen', function () {
-    $projekte = Projekt::all();
-    return view('student.dashboard', compact('projekte'));
-});
-
-// Tab 2: Meine Projekte (lädt zum Testen vorerst auch das Dashboard)
-Route::get('/student/meine-projekte', function () {
-    $projekte = Projekt::where('ersteller_id', Auth::id())->get();
-    return view('student.dashboard', compact('projekte'));
-});
-Route::get('/student/nutzer/neu', function () {
-    // Hier kommt später das Formular hin,
-    return "Hier entsteht das Formular zum Projekte erstellen !";
-});
-Route::get('/lehrende', function () {
-    return view('lehrende.dashboard');
-});
-Route::get('/admin',    function () {
-    return view('admin.dashboard');
-});
-
-// --- PROJEKT-DISKUSSION ---
-// Aufruf: /projekt/1  /projekt/2  usw.
-// Route::get('/projekt/{id}', function ($id) { return view('projekt.diskussion', ['projektId' => $id]); });//
-
-// --- STUDENTEN-ROUTEN ---
-Route::get('/student/neue-idee',      function () {
-    $kategorien = Kategorie::all();
-    return view('projekte.erstellen', compact('kategorien'));
-});
-Route::get('/student/alle-ideen',     function () {
-    $projekte = Projekt::all();
-    return view('student.dashboard', compact('projekte'));
-});
-Route::get('/student/meine-projekte', function () {
-    $projekte = Projekt::where('ersteller_id', Auth::id())->get();
-    return view('student.dashboard', compact('projekte'));
-});
-Route::get('/student/nutzer/neu',     function () {
-    return "Hier entsteht das Formular zum Projekte erstellen!";
-});
-
-// --- TAB-ROUTEN FÜR LEHRER ---
-// Tab 1: Alle Ideen (lädt die normale Übersicht)
-Route::get('/lehrende/alle-ideen', function () {
-    $projekte = Projekt::all();
-    return view('lehrende.dashboard', compact('projekte'));
-});
-// Tab 2: Betreute Projekte (lädt zum Testen vorerst auch das Dashboard)
-Route::get('/lehrende/betreute-projekte', function () {
-    $projekte = Projekt::all();
-    return view('lehrende.dashboard', compact('projekte'));
-});
-// 2. Admin Nutzerverwaltung (Übersicht aller Nutzer)
-Route::get('/admin/nutzer', function () {
-    // Hier kann später eine Tabelle mit allen Nutzern anzeigen lassen
-    $projekte = Projekt::all();
-    return view('admin.dashboard', compact('projekte'));
-});
-
-// Profil bearbeiten
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-
-    Route::patch('/profile', [ProfileController::class, 'update'])
-        ->name('profile.update');
-});
-
-
-// Login anzeigen
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-    ->name('login');
-
-// Login verarbeiten
+// --- AUTH ---
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-
-// abmelden button (einstellung)
 Route::post('/abmelden', [AuthenticatedSessionController::class, 'destroy'])->name('abmelden');
 
-// mein profil
+// --- PROFIL ---
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
-
-// Diskussionen
-Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])
-    ->name('diskussion.create');
-Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])
-    ->name('diskussion.speichern');
-Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])
-    ->name('diskussion.details');
-Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])
-    ->name('diskussion.antworten');
-Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])
-    ->name('diskussion.abstimmen');
-
-// --- LEHRENDEN-ROUTEN ---
-Route::get('/lehrende/alle-ideen',        function () {
-    return view('lehrende.dashboard');
+// --- STARTSEITE ---
+Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
+Route::get('/dashboard', function () {
+    return view('dashboard');
 });
-Route::get('/lehrende/betreute-projekte', function () {
-    return view('lehrende.dashboard');
+
+// --- STUDENT-ROUTEN ---
+Route::get('/student', function () {
+    $projekte = Projekt::all();
+    $istStudent = true;
+    $istLehrender = false;
+    $istAdmin = false;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
+Route::get('/student/alle-ideen', function () {
+    $projekte = Projekt::all();
+    $istStudent = true;
+    $istLehrender = false;
+    $istAdmin = false;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+});
+Route::get('/student/meine-projekte', function () {
+    $projekte = Projekt::where('ersteller_id', Auth::id())->get();
+    $istStudent = true;
+    $istLehrender = false;
+    $istAdmin = false;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+});
+Route::get('/student/neue-idee', function () {
+    $kategorien = Kategorie::all();
+    return view('projekte.erstellen', compact('kategorien'));
+});
+
+// --- LEHRENDE-ROUTEN ---
+Route::get('/lehrende', function () {
+    $projekte = Projekt::all();
+    $istStudent = false;
+    $istLehrender = true;
+    $istAdmin = false;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+});
+Route::get('/lehrende/alle-ideen', function () {
+    $projekte = Projekt::all();
+    $istStudent = false;
+    $istLehrender = true;
+    $istAdmin = false;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+});
+Route::get('/lehrende/betreute-projekte', [BetreuungController::class, 'index']);
 
 // --- ADMIN-ROUTEN ---
-Route::get('/admin/nutzer',     function () {
-    return view('admin.dashboard');
+Route::get('/admin', function () {
+    $projekte = Projekt::all();
+    $istStudent = false;
+    $istLehrender = false;
+    $istAdmin = true;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
-Route::get('/admin/nutzer/neu', function () {
-    return "Hier entsteht das Formular zum Nutzer anlegen!";
+Route::get('/admin/nutzer', function () {
+    $projekte = collect();
+    $nutzer = \App\Models\User::all();
+    $istStudent = false;
+    $istLehrender = false;
+    $istAdmin = true;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'nutzer', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
+Route::get('/admin/nutzer/neu', [NutzerController::class, 'benutzerAnlegen']);
+Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
+Route::delete('/admin/nutzer/{id}/loeschen', [NutzerController::class, 'loeschen'])->name('admin.nutzer.loeschen');
 
-// --- SUCH-ROUTEN ---
+// --- PROJEKTE ---
+Route::get('/projekte/meine', [ProjektController::class, 'meine'])->name('projekte.meine');
+Route::get('/projekte/erstellen', [ProjektController::class, 'erstellen'])->name('projekte.erstellen');
+Route::post('/projekte/speichern', [ProjektController::class, 'speichern'])->name('projekte.speichern');
+Route::get('/projekte/{id}', [ProjektController::class, 'details'])->name('projekte.details');
+Route::get('/projekte/{id}/bearbeiten', [ProjektController::class, 'bearbeiten'])->name('projekte.bearbeiten');
+Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisieren'])->name('projekte.aktualisieren');
+Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
 
-//Anpassungen an die jeweiligen unterschiedlichen Ansichten noch!!!!!!!!!!!!!!!!!
+// --- BETREUUNG ---
+Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class, 'uebernehmen'])->name('betreuung.uebernehmen');
+Route::post('/projekte/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])->name('betreuung.beenden');
+
+// --- DISKUSSIONEN ---
+Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])->name('diskussion.create');
+Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])->name('diskussion.speichern');
+Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])->name('diskussion.details');
+Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])->name('diskussion.antworten');
+Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])->name('diskussion.abstimmen');
+
+// --- SUCHE ---
 Route::get('/student/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('student.projekte.suchen');
 Route::get('/lehrende/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.projekte.suchen');
 Route::get('/admin/projektideen/suchen', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
 Route::get('/admin/nutzer/suchen', [SuchenFilternController::class, 'nachNutzernSuchen'])->name('admin.nutzer.suchen');
+
+// Test-Route
+Route::get('/test', function () {
+    return view('test');
+});

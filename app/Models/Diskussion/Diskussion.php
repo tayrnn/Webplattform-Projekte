@@ -5,7 +5,7 @@ namespace App\Models\Diskussion;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Nutzer\Nutzer; // Pfad ggf. anpassen falls Ihre User-Klasse woanders liegt
+use App\Models\User;
 use App\Models\Projekt\Projekt;
 
 class Diskussion extends Model
@@ -13,8 +13,8 @@ class Diskussion extends Model
     protected $table = 'discussions';
 
     protected $fillable = [
-        'title', 
-        'project_id', 
+        'title',
+        'project_id',
         'user_id'
     ];
 
@@ -22,8 +22,8 @@ class Diskussion extends Model
      * Der Nutzer, der dieses Thema gestartet hat.
      */
     public function ersteller(): BelongsTo
-     {
-        return $this->belongsTo(Nutzer::class, 'user_id');
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**
