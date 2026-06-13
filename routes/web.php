@@ -100,6 +100,18 @@ Route::get('/admin', function () {
     $kategorien = Kategorie::all();
     return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
+
+Route::get('/admin/meine-projekte', function () {
+    $projekte = Projekt::where('ersteller_id', Auth::id())->get();
+    $istStudent = false;
+    $istLehrender = false;
+    $istAdmin = true;
+    $filterKategorie = null;
+    $filterStatus = null;
+    $kategorien = Kategorie::all();
+    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+});
+
 Route::get('/admin/nutzer', function () {
     $projekte = collect();
     $nutzer = \App\Models\User::all();
@@ -124,16 +136,29 @@ Route::get('/projekte/{id}/bearbeiten', [ProjektController::class, 'bearbeiten']
 Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisieren'])->name('projekte.aktualisieren');
 Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
 
-// --- BETREUUNG ---
-Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class, 'uebernehmen'])->name('betreuung.uebernehmen');
-Route::post('/projekte/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])->name('betreuung.beenden');
+// --- BEWERTUNG (Sterne) ---
+Route::post('/projekte/{id}/bewerten', [ProjektController::class, 'bewerten'])->name('projekte.bewerten');
 
-// --- DISKUSSIONEN ---
-Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])->name('diskussion.create');
+// --- DISKUSSIONEN (VOLLSTÄNDIG) ---
+// Neues Thema speichern
 Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])->name('diskussion.speichern');
+
+// Diskussion-Detailseite anzeigen
 Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])->name('diskussion.details');
+
+// Diskussionsthema bearbeiten/löschen
+Route::put('/diskussion/{diskussion}/bearbeiten', [DiskussionController::class, 'bearbeiten'])->name('diskussion.bearbeiten');
+Route::delete('/diskussion/{diskussion}/loeschen', [DiskussionController::class, 'loeschen'])->name('diskussion.loeschen');
+
+// Antworten auf ein Diskussionsthema (Hauptbeiträge)
 Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])->name('diskussion.antworten');
-Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])->name('diskussion.abstimmen');
+
+// Beiträge (Antworten) bearbeiten/löschen
+Route::put('/diskussion-beitrag/{beitrag}/bearbeiten', [DiskussionController::class, 'beitragBearbeiten'])->name('diskussion.beitrag.bearbeiten');
+Route::delete('/diskussion-beitrag/{beitrag}/loeschen', [DiskussionController::class, 'beitragLoeschen'])->name('diskussion.beitrag.loeschen');
+
+// Unterantworten (Antworten auf einen bestimmten Beitrag)
+Route::post('/diskussion-beitrag/{beitrag}/unterantwort', [DiskussionController::class, 'unterantwortSpeichern'])->name('diskussion.unterantwort.speichern');
 
 // --- SUCHE ---
 Route::get('/student/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('student.projekte.suchen');
