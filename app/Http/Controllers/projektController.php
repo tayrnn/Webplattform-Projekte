@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller
 {
+    /*
     // Alle Projekte anzeigen (mit Filter nach Status)
     public function liste(Request $request)
     {
@@ -48,6 +49,8 @@ class ProjektController extends Controller
             'istAdmin'
         ));
     }
+        */
+    //-> erstmal auskommentiert -> bei web.php mit der suchen-Methode aus dem SuchenFilternController ersetzt, gab sonst Fehler bei der Datenbankabfrage
 
     // Nur eigene Projekte des eingeloggten Studenten anzeigen
     public function meine(Request $request)

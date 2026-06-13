@@ -12,37 +12,47 @@
                 <div class="flex gap-8">
                     @if($istStudent)
                     <a href="/student/alle-ideen"
-                        class="font-bold text-lg transition-colors {{ request()->is('student/alle-ideen') || request()->is('student') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
+                        class="font-bold text-lg transition-colors {{ request()->is('student/alle-ideen*') || request()->is('student') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
                         Ideen</a>
                     <a href="/student/meine-projekte"
-                        class="font-bold text-lg transition-colors {{ request()->is('student/meine-projekte') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Meine
+                        class="font-bold text-lg transition-colors {{ request()->is('student/meine-projekte*') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Meine
                         Projekte</a>
                     @elseif($istLehrender)
                     <a href="/lehrende/alle-ideen"
-                        class="font-bold text-lg transition-colors {{ request()->is('lehrende/alle-ideen') || request()->is('lehrende') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
+                        class="font-bold text-lg transition-colors {{ request()->is('lehrende/alle-ideen*') || request()->is('lehrende') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
                         Ideen</a>
                     <a href="/lehrende/betreute-projekte"
-                        class="font-bold text-lg transition-colors {{ request()->is('lehrende/betreute-projekte') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Betreute
+                        class="font-bold text-lg transition-colors {{ request()->is('lehrende/betreute-projekte*') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Betreute
                         Projekte</a>
                     @elseif($istAdmin)
                     <a href="/admin"
-                        class="font-bold text-lg transition-colors {{ request()->is('admin') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
+                        class="font-bold text-lg transition-colors {{ (request()->is('admin') || request()->is('admin/projekte*')) ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
                         Projekte</a>
                     <a href="/admin/nutzer"
-                        class="font-bold text-lg transition-colors {{ request()->is('admin/nutzer') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Nutzerverwaltung</a>
+                        class="font-bold text-lg transition-colors {{ (request()->is('admin/nutzer') || request()->is('admin/nutzer/suchen*')) ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Nutzerverwaltung</a>
                     @endif
                 </div>
 
                 <!-- Rechte Seite: Filter + Buttons -->
                 <div class="flex items-center gap-3 mb-1">
                     @php
-                    $activeStatus = request('status', '');
-                    $activeKategorie = request('kategorie', '');
-                    $anzahl = ($activeStatus ? 1 : 0) + ($activeKategorie ? 1 : 0);
+                    //Auswahl mehrerer Filteroptionen gleichzeitig ermöglichen (Armin)
+                    $activeStatus = request('filterStatus', []);
+                    if (!is_array($activeStatus)) { $activeStatus = [$activeStatus]; } //automatische Umwandlung in ein Array, falls nur ein einzelner Wert übergeben wird (Sicherheitsmaßname)
+                    $activeKategorie = request('filterKategorie', []);
+                    if (!is_array($activeKategorie)) { $activeKategorie = [$activeKategorie]; }
+                    $anzahl = count(array_filter($activeStatus)) + count(array_filter($activeKategorie)); //Anzahl der Filteroptionen wird via count gezählt
+
+                    //array_filter entfernt leere Werte, damit die Anzahl der aktiven Filter korrekt gezählt wird, auch wenn nur ein einzelner Filter ausgewählt ist
+                    $dropdownAktiv = $anzahl > 0 ? 'true' : 'false'; //Variable, damit das Dropdown-Menü auch nach Filter-Auswahl geöffnet bleibt
+
+                    $istAdminNutzerverwaltung = Auth::check() && Auth::user()->role === 'admin' && (request()->is('admin/nutzer*'));
+
+                    $zielRoute = $istAdminNutzerverwaltung ? route('admin.nutzer.suchen') : url()->current();
                     @endphp
 
                     {{-- Filter-Dropdown (Taqwa) --}}
-                    <div class="relative" x-data="{ offen: false }" @click.outside="offen = false">
+                    <div class="relative" x-data="{ offen: {{ $dropdownAktiv }} }" @click.outside="offen = false">
                         <button @click="offen = !offen" type="button"
                             class="flex items-center gap-2 px-4 py-2 text-sm font-semibold border rounded-md bg-white transition-colors hover:border-[#0066cc] hover:text-[#0066cc]"
                             :class="offen ? 'border-[#0066cc] text-[#0066cc] bg-blue-50' : 'border-gray-300 text-gray-600'">
@@ -66,47 +76,66 @@
                             x-transition:enter-start="opacity-0 -translate-y-1"
                             x-transition:enter-end="opacity-100 translate-y-0" x-cloak
                             class="absolute right-0 top-[calc(100%+8px)] z-50 w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-4">
-                            <form method="GET" action="{{ url()->current() }}" id="filter-form">
+                            <form method="GET" action="{{ $zielRoute }}" id="filter-form">
+
+                                {{-- Suchbegriff mitsenden, damit die Kombination von Suchbegriff und Filtern möglich ist --}}
+                                @if(request('suche'))
+                                    <input type="hidden" name="suche" value="{{ request('suche') }}">
+                                @endif
+
                                 <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Status</p>
                                 @foreach(['offen' => 'Offen', 'in_bearbeitung' => 'In Bearbeitung', 'abgeschlossen' =>
                                 'Abgeschlossen', 'betreuer_gesucht' => 'Betreuer gesucht'] as $wert => $label)
+                                @php $statusChecked = in_array($wert, $activeStatus); 
+                                //sorgt dafür, dass die Variable $activeStatus den aktuellen Status des Filters korrekt wiedergibt, auch wenn mehrere Filteroptionen gleichzeitig ausgewählt sind
+                                @endphp 
+                                
                                 <label
                                     class="flex items-center gap-3 px-2 py-1.5 rounded-lg cursor-pointer text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <input type="radio" name="status" value="{{ $wert }}" class="hidden"
-                                        {{ $activeStatus === $wert ? 'checked' : '' }}
-                                        onchange="document.getElementById('filter-form').submit()">
+                                    <input type="checkbox" name="filterStatus[]" value="{{ $wert }}" class="hidden" {{-- Mehrfachauswahl ermöglichen + PHP anweisen, mehrere Werte zu übergeben --}}
+                                        {{ $statusChecked ? 'checked' : '' }}
+                                        onchange="this.form.submit()"> {{-- automatisches Absenden der Filteroption beim Anklicken --}}
                                     <span
-                                        class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 {{ $activeStatus === $wert ? 'border-[#0066cc] bg-[#0066cc]' : 'border-gray-300 bg-white' }}">
-                                        @if($activeStatus === $wert)<span
-                                            class="w-1.5 h-1.5 rounded-full bg-white"></span>@endif
+                                        class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 {{ $statusChecked ? 'border-[#0066cc] bg-[#0066cc]' : 'border-gray-300 bg-white' }}">
+                                        @if($statusChecked)
+                                        <svg 
+                                            class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                <polyline points="20 6 9 17 4 12" /> {{-- die Linie des Häkchens in der Checkbox --}}
+                                        </svg> {{-- Formatierung des Häkchens in der Checkbox --}}
+                                        @endif 
                                     </span>
-                                    {{ $label }}
+                                    {{ $label }} 
                                 </label>
                                 @endforeach
 
                                 <hr class="my-3 border-gray-100">
 
-                                <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Kategorien
-                                </p>
-                                @foreach(['programmierung' => 'Programmierung', 'ki' => 'KI (Künstliche Intelligenz)',
-                                'betriebssysteme' => 'Betriebssysteme'] as $wert => $label)
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Kategorien</p>
+                                @foreach($kategorien as $kategorie) {{-- dynamische Erzeugung der Filteroptionen auf Basis der aus der Datenbank an den View übergebenen Kategorien --}}
+                                @php $kategorieChecked = in_array($kategorie->id, $activeKategorie); @endphp {{-- Überprüfung, bei welchen Kategorien der Filter aktiv ist --}}
                                 <label
                                     class="flex items-center gap-3 px-2 py-1.5 rounded-lg cursor-pointer text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                    <input type="radio" name="kategorie" value="{{ $wert }}" class="hidden"
-                                        {{ $activeKategorie === $wert ? 'checked' : '' }}
-                                        onchange="document.getElementById('filter-form').submit()">
+                                    <input type="checkbox" name="filterKategorie[]" value="{{ $kategorie->id }}" class="hidden"
+                                        {{ $kategorieChecked ? 'checked' : '' }}
+                                        onchange="this.form.submit()"> {{-- automatisches Absenden der Filteroption beim Anklicken --}}
                                     <span
-                                        class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 {{ $activeKategorie === $wert ? 'border-[#0066cc] bg-[#0066cc]' : 'border-gray-300 bg-white' }}">
-                                        @if($activeKategorie === $wert)<span
-                                            class="w-1.5 h-1.5 rounded-full bg-white"></span>@endif
+                                        class="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 {{ $kategorieChecked ? 'border-[#0066cc] bg-[#0066cc]' : 'border-gray-300 bg-white' }}">
+                                        @if($kategorieChecked)
+                                        <svg
+                                            class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                <polyline points="20 6 9 17 4 12" /> {{-- die Linie des Häkchens in der Checkbox --}}
+                                        </svg> {{-- Formatierung des Häkchens in der Checkbox --}}
+                                        @endif
                                     </span>
-                                    {{ $label }}
+                                    {{ $kategorie->name }} {{-- Anzeige der Filteroptionen mit lesbaren Labels dynamisch anhand der übergebenen Werte --}}
                                 </label>
                                 @endforeach
 
+                                {{-- Button zum Zurücksetzen der Filteroptionen --}}
                                 @if($anzahl > 0)
                                 <div class="mt-3 pt-3 border-t border-gray-100 text-center">
-                                    <a href="{{ url()->current() }}"
+                                    {{-- damit der Suchbegriff beim Zurücksetzen der Filteroptionen erhalten bleibt, wird die aktuelle URL mit den bestehenden Suchparametern beibehalten, nur die Filter-Parameter werden entfernt --}}
+                                    <a href="{{ request()->fullUrlWithQuery(['filterStatus' => null, 'filterKategorie' => null]) }}"
                                         class="text-sm text-[#0066cc] hover:underline">Filter zurücksetzen</a>
                                 </div>
                                 @endif
@@ -146,7 +175,7 @@
             @endif
 
             {{-- Projektkarten Grid (Akshata - Layout, Taqwa - project-card Komponente) --}}
-            @if(!($istAdmin && request()->is('admin/nutzer')))
+            @if(!($istAdmin && (request()->is('admin/nutzer') || request()->is('admin/nutzer/suchen'))))
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($projekte as $projekt)
                 <div>
@@ -164,7 +193,7 @@
             @endif
 
             {{-- Nutzerverwaltung Tabelle - Admin only (Tayrit) --}}
-            @if($istAdmin && request()->is('admin/nutzer'))
+            @if($istAdmin && (request()->is('admin/nutzer') || request()->is('admin/nutzer/suchen')))
             <div class="mt-8">
                 <table class="w-full text-sm border border-gray-200 rounded-xl overflow-hidden">
                     <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
