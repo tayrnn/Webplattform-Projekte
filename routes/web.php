@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NutzerController;
-use App\Http\Controllers\ProjektController;
+use App\Http\Controllers\projektController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Models\Projekt\Projekt;
@@ -123,6 +123,7 @@ Route::get('/projekte/{id}', [ProjektController::class, 'details'])->name('proje
 Route::get('/projekte/{id}/bearbeiten', [ProjektController::class, 'bearbeiten'])->name('projekte.bearbeiten');
 Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisieren'])->name('projekte.aktualisieren');
 Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
+Route::patch('/projekte/{id}/status', [projektController::class, 'statusAendern'])->name('projekte.status');
 
 // --- BETREUUNG ---
 Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class, 'uebernehmen'])->name('betreuung.uebernehmen');

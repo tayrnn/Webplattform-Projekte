@@ -1,5 +1,5 @@
 @props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'projektId' => 1, 'id', 'isPublic' =>
-true])
+true, 'zeigeSichtbarkeit' => false])
 
 @php
 $statusWert = $status instanceof \App\Models\Projekt\Bearbeitungsstatus ? $status->value : ($status ?? 'offen');
@@ -21,26 +21,18 @@ default => ['bg' => 'bg-gray-100 text-gray-500', 'label' => $status],
         <!-- Linke Seite: Titel und Label -->
         <div class="flex flex-col items-start">
             <h3 class="text-xl font-bold text-[#1a202c]">{{ $title }}</h3>
-
+            
+        @if($zeigeSichtbarkeit)
             @if(!$isPublic)
-            <span
-                class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-gray-100 text-gray-600 border border-gray-300">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-gray-100 text-gray-600 border border-gray-300">
                 🔒 Privat
             </span>
             @else
-            <span
-                class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-blue-50 text-blue-600 border border-blue-200">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-blue-50 text-blue-600 border border-blue-200">
                 🌐 Öffentlich
             </span>
             @endif
-
-            @if($needsSupervision)
-            <!-- Das gelbe "Sucht Betreuer" Label  -->
-            <span
-                class="inline-flex items-center gap-1 mt-2 px-2 py-1 text-[11px] font-medium rounded bg-[#fff8e1] text-[#b7791f] border border-[#f6e05e]">
-                🔍 Sucht Betreuer
-            </span>
-            @endif
+        @endif
         </div>
         <span class="px-3 py-1 text-xs font-semibold rounded-full ml-4 whitespace-nowrap {{ $statusConfig['bg'] }}">
             {{ $statusConfig['label'] }}

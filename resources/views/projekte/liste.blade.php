@@ -152,7 +152,8 @@
                 <div>
                     <x-project-card :title="$projekt->projektname" :status="$projekt->bearbeitungsstatus"
                         :beschreibung="$projekt->beschreibung" :needsSupervision="$projekt->betreuer_id === null"
-                        :id="$projekt->id" :projektId="$projekt->id" :isPublic="$projekt->is_public" />
+                        :id="$projekt->id" :projektId="$projekt->id" :isPublic="$projekt->is_public"
+                        :zeigeSichtbarkeit="request()->is('student/meine-projekte')" />
                 </div>
                 @empty
                 <div class="text-center py-20 text-gray-400 col-span-3">
