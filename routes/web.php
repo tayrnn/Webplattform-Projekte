@@ -11,6 +11,8 @@ use App\Http\Controllers\BetreuungController;
 use App\Models\Projekt\Kategorie;
 use App\Http\Controllers\DiskussionController;
 use App\Http\Controllers\SuchenFilternController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 
 // --- AUTH ---
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -100,17 +102,9 @@ Route::get('/admin', function () {
     $kategorien = Kategorie::all();
     return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
-Route::get('/admin/nutzer', function () {
-    $projekte = collect();
-    $nutzer = \App\Models\User::all();
-    $istStudent = false;
-    $istLehrender = false;
-    $istAdmin = true;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'nutzer', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
-});
+Route::get('/admin/nutzer', [NutzerController::class, 'index']);
+
+
 Route::get('/admin/nutzer/neu', [NutzerController::class, 'benutzerAnlegen']);
 Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
 Route::delete('/admin/nutzer/{id}/loeschen', [NutzerController::class, 'loeschen'])->name('admin.nutzer.loeschen');
@@ -140,6 +134,21 @@ Route::get('/student/projekte/suchen', [SuchenFilternController::class, 'suchen'
 Route::get('/lehrende/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.projekte.suchen');
 Route::get('/admin/projektideen/suchen', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
 Route::get('/admin/nutzer/suchen', [SuchenFilternController::class, 'nachNutzernSuchen'])->name('admin.nutzer.suchen');
+
+
+// --- PASSWORT RESET ---
+Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
+    ->name('password.request');
+
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+    ->name('password.email');
+
+Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])
+    ->name('password.reset');
+
+Route::post('/reset-password', [NewPasswordController::class, 'store'])
+    ->name('password.store');
+
 
 // Test-Route
 Route::get('/test', function () {

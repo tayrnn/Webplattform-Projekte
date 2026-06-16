@@ -135,10 +135,12 @@ class ProjektController extends Controller
         $projekt = Projekt::findOrFail($id);
 
         // Sicherheitspruefung: nur der Ersteller darf bearbeiten
-        if ($projekt->ersteller_id !== Auth::id()) {
-            return redirect()->route('projekte.liste')
-                ->with('fehler', 'Du kannst nur deine eigenen Ideen bearbeiten.');
-        }
+    $istAdmin = Auth::check() && Auth::user()->role === 'admin';
+
+if (!$istAdmin && $projekt->ersteller_id !== Auth::id()) {
+    return redirect()->route('projekte.liste')
+        ->with('fehler', 'Keine Berechtigung.');
+}
 
         $kategorien = Kategorie::all();
         $istStudent = true;
@@ -152,10 +154,12 @@ class ProjektController extends Controller
         $projekt = Projekt::findOrFail($id);
 
         // Sicherheitspruefung
-        if ($projekt->ersteller_id !== Auth::id()) {
-            return redirect()->route('projekte.liste')
-                ->with('fehler', 'Du kannst nur deine eigenen Ideen bearbeiten.');
-        }
+        $istAdmin = Auth::check() && Auth::user()->role === 'admin';
+
+if (!$istAdmin && $projekt->ersteller_id !== Auth::id()) {
+    return redirect()->route('projekte.liste')
+        ->with('fehler', 'Keine Berechtigung.');
+}
 
         $validierteEingaben = $request->validate([
             'projektname'  => 'required|string|max:255',

@@ -22,12 +22,11 @@ class NutzerController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'role' => ['required', 'in:student,lehrender,admin'],
         ]);
-
+        
         $temporaryPassword = Str::random(10);
-
+    
         User::create([
             'name' => $validated['vorname'] . ' ' . $validated['nachname'],
-            'username' => Str::slug($validated['vorname'] . '.' . $validated['nachname']) . rand(100, 999),
             'email' => $validated['email'],
             'password' => Hash::make($temporaryPassword),
             'role' => $validated['role'],
@@ -36,6 +35,12 @@ class NutzerController extends Controller
         return redirect('/admin/nutzer/neu')
             ->with('success', 'Benutzer wurde erstellt. Temporäres Passwort: ' . $temporaryPassword);
     }
+    public function index()
+{
+    $nutzer = \App\Models\User::all();
+
+    return view('admin.nutzer-liste', compact('nutzer'));
+}
 
     public function loeschen($id)
     {

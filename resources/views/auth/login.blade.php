@@ -129,6 +129,12 @@
                     font-size:15px; cursor:pointer;">
                         Anmelden
                     </button>
+                    <div style="margin-top:15px;text-align:center;">
+    <a href="{{ route('password.request') }}"
+       style="color:#6ba9dc;text-decoration:none;font-size:14px;">
+        Passwort vergessen?
+    </a>
+</div>
 
                 </form>
             </div>

@@ -123,15 +123,18 @@
                     
                     {{-- Buttons --}}
                     <div class="flex gap-3 mt-6">
-                        <button type="submit"
-                                class="bg-[#6ba9dc] hover:bg-[#5a91c4] text-white px-6 py-3 rounded-md font-bold transition-colors shadow-sm">
-                            Änderungen speichern →
-                        </button>
-                        <a href="{{ route('projekte.details', $projekt->id) }}"
-                           class="px-6 py-3 border border-gray-300 rounded-md text-sm text-gray-600 hover:bg-gray-50 transition font-medium">
-                            Abbrechen
-                        </a>
-                    </div>
+
+    <button type="submit"
+        style="background:#6ba9dc;color:white;padding:12px 24px;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">
+        Änderungen speichern →
+    </button>
+
+    <a href="{{ route('projekte.details', $projekt->id) }}"
+       class="px-6 py-3 border border-gray-300 rounded-md text-sm">
+       Abbrechen
+    </a>
+
+</div>
 
                 </form>
             </div>

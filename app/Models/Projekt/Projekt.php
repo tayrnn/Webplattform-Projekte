@@ -26,6 +26,7 @@ class Projekt extends Model
         'beschreibung',
         'bearbeitungsstatus', // offen, geschlossen
         'bildpfad',
+        'mitglied',
         'ersteller_id',
     ];
 

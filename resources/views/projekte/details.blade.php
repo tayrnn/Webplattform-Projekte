@@ -157,14 +157,27 @@
                 <div class="flex flex-col gap-4">
 
                     {{-- Aktionen für eigene Projekte (Akshata) --}}
-                    @if($istStudent && $projekt->ersteller_id === auth()->id())
+                    @if(auth()->check())
+    <p>Eingeloggt: JA</p>
+    <p>Name: {{ auth()->user()->name }}</p>
+    <p>Role: {{ auth()->user()->role }}</p>
+@else
+    <p>Eingeloggt: NEIN</p>
+@endif
+                    @if(
+    auth()->check()
+    && (
+        auth()->user()->role === 'admin'
+        || $projekt->ersteller_id === auth()->id()
+    )
+)
                     <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                         <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Meine Idee</div>
 
                         <a href="{{ route('projekte.bearbeiten', $projekt->id) }}"
-                            class="block w-full text-center bg-[#6ba9dc] hover:bg-[#5a91c4] text-white py-2 rounded-md text-sm font-bold transition mb-3">
-                            ✏️ Idee bearbeiten
-                        </a>
+   style="display:block;width:100%;text-align:center;background:#6ba9dc;color:white;padding:10px;border-radius:8px;font-weight:bold;margin-bottom:12px;text-decoration:none;">
+   ✏️ Idee bearbeiten
+</a>
 
                         <form method="POST" action="{{ route('projekte.loeschen', $projekt->id) }}"
                             onsubmit="return confirm('Idee wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')">
