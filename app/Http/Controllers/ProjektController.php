@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Projekt\Bearbeitungsstatus;
 use Illuminate\Http\Request;
 use App\Models\Projekt\Projekt;
 use App\Models\Projekt\Kategorie;
@@ -96,8 +97,7 @@ class ProjektController extends Controller
         Projekt::create([
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
-            'bearbeitungsstatus' => 'neu',
-            'mitglied'           => '',
+            'bearbeitungsstatus' => Bearbeitungsstatus::Offen,
             'ersteller_id'            => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
