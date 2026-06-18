@@ -124,47 +124,21 @@ class DiskussionenController extends Controller
      * Löscht einen Beitrag (Ersteller oder Admin)
      */
     public function beitragLoeschen($id) {
-
         $beitrag = Diskussionsantwort::findOrFail($id);
 
-        // Berechtigungsprüfung: Nur Ersteller oder Admins dürfen löschen
-        $istAdmin = auth()->user()->isAdmin(); // Annahme: User-Modell hat isAdmin()-Methode
-        $istErsteller = auth()->id() === $beitrag->user_id;
-
-        if (!$istErsteller && !$istAdmin) {
-            return redirect()->back()->with('fehler', 'Du hast keine Berechtigung, diesen Beitrag zu löschen.');
+        // 1. Berechtigungsprüfung (mit deiner neuen Logik aus dem Modell)
+        if (!$beitrag->darfLoeschen(auth()->user())) {
+            return redirect()->back()->with('fehler', 'Du hast keine Berechtigung.');
         }
 
-        // Hauptkommentar
-        if (is_null($beitrag->parent_id)) {
-            // Wenn Antworten existieren -> Inhalt durch Dummy ersetzen
-            if ($beitrag->unterantworten()->exists()) {
-                $beitrag->update([
-                    'content' => '[Dieser Beitrag wurde gelöscht]',
-                    'user_id' => null
-                ]);
-                return redirect()->back()->with('erfolg', 'Beitrag wurde ausgeblendet');
-            }
-            // Keine Antworten -> Beitrag komplett löschen
-            $beitrag->delete();
-            return redirect()->back()->with('erfolg', 'Beitrag wurde erfolgreich gelöscht!');
-        }
+        // 2. Einfaches Soft-Delete für ALLE Beiträge (egal ob Haupt oder Unter)
+        // Wir setzen einfach nur den Zeitstempel. Die Hierarchie bleibt erhalten.
+        $beitrag->update([
+            'deleted_at' => now(),
+            'content'    => '[Dieser Beitrag wurde gelöscht]' // Optional: Inhalt leeren
+        ]);
 
-        $parentId = $beitrag->parent_id;
-
-        // Unterantwort (Antwort auf Beitrag)
-        $beitrag->delete();
-        
-        // Hauptbeitrag war ausgeblendet und das die letzte Unterantwort die gelöscht wird 
-        // -> Hauptbeitrag komplett aus Diskussion löschen
-        if (!is_null($parentId)) {
-            $hauptbeitrag = Diskussionsantwort::find($parentId);
-            if ($hauptbeitrag && is_null($hauptbeitrag->user_id) && $hauptbeitrag->unterantworten()->count() === 0) {
-                $hauptbeitrag->delete();
-                return redirect()->back()->with('erfolg', 'Antwort und leerer Hauptbeitrag wurden erfolgreich gelöscht!');
-            }
-        }
-        return redirect()->back()->with('erfolg', 'Antwort wurde erfolgreich gelöscht!');
+        return redirect()->back()->with('erfolg', 'Beitrag gelöscht am: ' . now()->format('d.m.Y H:i'));
     }
 
     /**
@@ -192,4 +166,22 @@ class DiskussionenController extends Controller
         $diskussion->delete();
         return redirect()->back()->with('erfolg', 'Die Diskussion wurde erfolgreich gelöscht!');
         }
+
+
+    public function beitragBearbeiten(Request $request, $id) {
+        $beitrag = Diskussionsantwort::findOrFail($id);
+    
+        if (!$beitrag->darfBearbeiten(auth()->user())) {
+            return back()->with('fehler', 'Du darfst diesen Beitrag nicht bearbeiten.');
+        }
+
+        $request->validate(['content' => 'required|string']);
+
+        $beitrag->update([
+            'content' => $request->content,
+            'edited_at' => now(), // Setzt den Zeitstempel
+        ]);
+
+        return back()->with('erfolg', 'Beitrag wurde aktualisiert.');
+}
 }

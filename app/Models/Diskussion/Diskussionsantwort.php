@@ -18,6 +18,11 @@ class Diskussionsantwort extends Model
         'parent_id' // NULL -> Hauptkommentar, sonst Antwort
     ];
 
+    protected $casts = [
+    'deleted_at' => 'datetime',
+    'edited_at' => 'datetime',
+];
+
     /**
      * Der Nutzer, der diese Antwort verfasst hat.
      */
@@ -44,5 +49,17 @@ class Diskussionsantwort extends Model
     {
         return $this->hasMany(self::class, 'parent_id')
             ->orderBy('created_at', 'asc');
+    }
+
+    public function darfBearbeiten($user): bool {
+        return $user && $user->id === $this->user_id;
+    }
+
+    public function darfLoeschen($user): bool {
+        // Admin darf alles, Ersteller darf seine eigenen, Diskussion-Ersteller/Projekt-Inhaber dürfen auch
+        return $user->isAdmin() || 
+            $user->id === $this->user_id ||
+            $user->id === $this->diskussion->user_id ||
+            $user->id === $this->diskussion->projekt->user_id;
     }
 }
