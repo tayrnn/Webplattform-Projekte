@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller
 {
+    /*
     // Alle Projekte anzeigen (mit Filter nach Status)
     public function liste(Request $request)
     {
@@ -48,6 +49,8 @@ class ProjektController extends Controller
             'istAdmin'
         ));
     }
+        */
+    //-> erstmal auskommentiert -> bei web.php mit der suchen-Methode aus dem SuchenFilternController ersetzt, gab sonst Fehler bei der Datenbankabfrage
 
     // Nur eigene Projekte des eingeloggten Studenten anzeigen
     public function meine(Request $request)
@@ -91,19 +94,16 @@ class ProjektController extends Controller
         $validierteEingaben = $request->validate([
             'projektname'  => 'required|string|max:255',
             'beschreibung' => 'required|string',
-            'category_id'  => 'required|exists:categories,id',
         ]);
 
         // Projekt erstellen - Status wird automatisch auf "neu" gesetzt
-        $projekt = Projekt::create([
+        Projekt::create([
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => Bearbeitungsstatus::Offen,
             'ersteller_id'            => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
-
-        $projekt->kategorien()->attach($validierteEingaben['category_id']);
 
         return redirect()->route('projekte.liste')
             ->with('erfolg', 'Deine Projektidee wurde erfolgreich eingereicht!');
@@ -168,7 +168,7 @@ class ProjektController extends Controller
         $projekt->update([
             'projektname'  => $validierteEingaben['projektname'],
             'beschreibung' => $validierteEingaben['beschreibung'],
-            'is_public'    => $request->input('is_public', 1),
+            'is_public' => (int)$request->input('is_public', 1),
         ]);
 
         return redirect()->route('projekte.details', $projekt->id)
