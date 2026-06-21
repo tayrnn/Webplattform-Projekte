@@ -28,6 +28,12 @@
                     <a href="/admin"
                         class="font-bold text-lg transition-colors {{ (request()->is('admin') || request()->is('admin/projekte*')) ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Alle
                         Projekte</a>
+
+                    {{-- ===== NEUER TAB: MEINE PROJEKTE (Taqwa) ===== --}}
+                    <a href="/admin/meine-projekte"
+                        class="font-bold text-lg transition-colors {{ request()->is('admin/meine-projekte') ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Meine
+                        Projekte</a>
+
                     <a href="/admin/nutzer"
                         class="font-bold text-lg transition-colors {{ (request()->is('admin/nutzer') || request()->is('admin/nutzer/suchen*')) ? 'border-b-2 border-[#0066cc] text-[#0066cc]' : 'text-gray-400 hover:text-[#0066cc]' }}">Nutzerverwaltung</a>
                     @endif

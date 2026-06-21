@@ -16,7 +16,7 @@
             <div class="flex justify-between items-end border-b border-gray-300 mb-8 pb-3">
                 <a href="{{ route('projekte.liste') }}"
                     class="font-bold text-lg transition-colors text-gray-400 hover:text-[#0066cc]">
-                    ← Zurück zur Übersicht
+                    ← Zurück
                 </a>
             </div>
 
@@ -121,17 +121,16 @@
                                         @endfor
                                 </div>
 
-                                {{-- Speichern-Button erscheint nur nach Auswahl (Taqwa) 
+                                {{-- Speichern-Button erscheint nur nach Auswahl (Taqwa)--}}
                                 <form action="{{ route('projekte.bewerten', $projekt->id) }}" method="POST"
-                                x-show="selected > 0 && !saved" style="display:none">
-                                @csrf
-                                <input type="hidden" name="bewertung" :value="selected">
-                                <button type="submit" @click="saved = true"
-                                    class="text-xs px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium">
-                                    Speichern
-                                </button>
+                                    x-show="selected > 0 && !saved" style="display:none">
+                                    @csrf
+                                    <input type="hidden" name="bewertung" :value="selected">
+                                    <button type="submit" @click="saved = true"
+                                        class="text-xs px-3 py-1  bg-[#6ba9dc] hover:bg-[#5a91c4]  text-white transition font-medium">
+                                        Speichern
+                                    </button>
                                 </form>
-                                --}}
 
                                 <span x-show="saved && selected > 0" class="text-xs text-green-600 font-medium"
                                     style="display:none">
@@ -156,11 +155,16 @@
                 {{-- ===== SEITENLEISTE: Akshata ===== --}}
                 <div class="flex flex-col gap-4">
 
-                    {{-- Aktionen für eigene Projekte (Akshata) --}}
-                    @if($istStudent && $projekt->ersteller_id === auth()->id())
+                    {{-- Aktionen für Projekte (Sichtbar für Besitzer ODER Admin) --}}
+                    @if(auth()->check() && ($projekt->ersteller_id === auth()->id() || auth()->user()->role ===
+                    'admin'))
                     <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Meine Idee</div>
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">
+                            {{ $projekt->ersteller_id === auth()->id() ? 'Meine Idee' : 'Administration' }}
+                        </div>
 
+                        {{-- Bearbeiten darf NUR der Ersteller selbst --}}
+                        @if($projekt->ersteller_id === auth()->id())
                         <a href="{{ route('projekte.bearbeiten', $projekt->id) }}"
                             class="block w-full text-center bg-[#6ba9dc] hover:bg-[#5a91c4] text-white py-2 rounded-md text-sm font-bold transition mb-3">
                             ✏️ Idee bearbeiten
@@ -169,22 +173,27 @@
                         {{-- Status aendern (Student & Admin) --}}
                         @if($istStudent && $projekt->ersteller_id === auth()->id() || $istAdmin)
                         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Status ändern</div>
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Status ändern
+                            </div>
                             <form method="POST" action="{{ route('projekte.status', $projekt->id) }}">
                                 @csrf
                                 @method('PATCH')
                                 <select name="bearbeitungsstatus"
                                     class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#0066cc] mb-3">
-                                    <option value="offen" {{ $projekt->bearbeitungsstatus === 'offen' ? 'selected' : '' }}>
+                                    <option value="offen"
+                                        {{ $projekt->bearbeitungsstatus === 'offen' ? 'selected' : '' }}>
                                         Offen
                                     </option>
-                                    <option value="in_bearbeitung" {{ $projekt->bearbeitungsstatus === 'in_bearbeitung' ? 'selected' : '' }}>
+                                    <option value="in_bearbeitung"
+                                        {{ $projekt->bearbeitungsstatus === 'in_bearbeitung' ? 'selected' : '' }}>
                                         In Bearbeitung
                                     </option>
-                                    <option value="abgeschlossen" {{ $projekt->bearbeitungsstatus === 'abgeschlossen' ? 'selected' : '' }}>
+                                    <option value="abgeschlossen"
+                                        {{ $projekt->bearbeitungsstatus === 'abgeschlossen' ? 'selected' : '' }}>
                                         Abgeschlossen
                                     </option>
-                                    <option value="betreuer_gesucht" {{ $projekt->bearbeitungsstatus === 'betreuer_gesucht' ? 'selected' : '' }}>
+                                    <option value="betreuer_gesucht"
+                                        {{ $projekt->bearbeitungsstatus === 'betreuer_gesucht' ? 'selected' : '' }}>
                                         Betreuer gesucht
                                     </option>
                                 </select>
@@ -196,6 +205,7 @@
                         </div>
                         @endif
 
+                        {{-- Löschen dürfen Ersteller UND Admin --}}
                         <form method="POST" action="{{ route('projekte.loeschen', $projekt->id) }}"
                             onsubmit="return confirm('Idee wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')">
                             @csrf
@@ -207,7 +217,6 @@
                         </form>
                     </div>
                     @endif
-
                     {{-- Betreuung übernehmen, für Lehrende (Tayrit) --}}
                     @if(Auth::check() && Auth::user()->role === 'lehrender' && $projekt->betreuer_id === null)
                     <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm"
@@ -285,42 +294,111 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
 
                 {{-- Diskussionen (Taqwa) --}}
-                <div>
+                <div class="flex flex-col">
                     <h2
                         class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                        Diskussionen ({{ $projekt->diskussionen->count() }})
+                        💬 Diskussionen
                     </h2>
 
-                    @forelse($projekt->diskussionen ?? [] as $diskussion)
-                    <a href="{{ route('diskussion.details', $diskussion->id) }}"
-                        class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-3 mb-2 hover:border-blue-300 transition-colors group">
-                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold uppercase flex-shrink-0"
-                            style="background:#E6F1FB;color:#0C447C">
-                            {{ substr($diskussion->ersteller->name ?? 'NA', 0, 2) }}
+                    @forelse($projekt->diskussionen->where('ist_umfrage', false) as $diskussion)
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 mb-3 relative"
+                        x-data="{ menuOpen: false, editDiscussion: false, zeigeAntwortBox: false }">
+
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-sm font-medium text-gray-800">{{ $diskussion->title }}</h3>
+
+                            {{-- Drei-Punkte-Menü für Diskussionsthema (Autor ODER Admin) --}}
+                            @if(auth()->check() && ($diskussion->user_id === auth()->id() || auth()->user()->role ===
+                            'admin'))
+                            <div class="relative">
+                                <button @click="menuOpen = !menuOpen"
+                                    class="text-gray-400 hover:text-gray-600 text-lg leading-none">⋮</button>
+                                <div x-show="menuOpen" @click.away="menuOpen = false" style="display:none"
+                                    class="absolute right-0 mt-1 w-28 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+
+                                    {{-- Bearbeiten nur für den Autor --}}
+                                    @if(auth()->id() === $diskussion->user_id)
+                                    <button @click="editDiscussion = true; menuOpen = false"
+                                        class="block w-full text-left px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-100">✎
+                                        Bearbeiten</button>
+                                    @endif
+
+                                    {{-- Löschen für Autor UND Admin --}}
+                                    <form action="{{ route('diskussion.loeschen', $diskussion->id) }}" method="POST"
+                                        onsubmit="return confirm('Thema wirklich löschen?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit"
+                                            class="block w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-gray-100 border-t border-gray-50">🗑
+                                            Löschen</button>
+                                    </form>
+                                </div>
+                            </div>
+                            @endif
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-gray-800 truncate">{{ $diskussion->title }}</p>
-                            <p class="text-xs text-gray-400 mt-0.5">
-                                {{ $diskussion->ersteller->name ?? '–' }}
-                                · {{ $diskussion->created_at->diffForHumans() }}
-                                · {{ $diskussion->antworten_count ?? 0 }} Antworten
-                            </p>
+
+                        {{-- Edit Formular --}}
+                        <div x-show="editDiscussion" x-collapse>
+                            <form action="{{ route('diskussion.bearbeiten', $diskussion->id) }}" method="POST"
+                                class="mt-2">
+                                @csrf
+                                @method('PUT')
+                                <textarea name="title" rows="2"
+                                    class="w-full text-sm border border-gray-200 rounded-lg px-2 py-1 mb-2">{{ $diskussion->title }}</textarea>
+                                <div class="flex justify-end gap-2">
+                                    <button type="button" @click="editDiscussion = false"
+                                        class="text-xs text-gray-500 hover:bg-gray-100 px-2 py-1 rounded">Abbrechen</button>
+                                    <button type="submit"
+                                        class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Speichern</button>
+                                </div>
+                            </form>
                         </div>
-                        <svg class="w-4 h-4 text-gray-300 group-hover:text-blue-400 flex-shrink-0 transition-colors"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </a>
+
+                        {{-- Schnellantwort & Pfeil --}}
+                        <div class="mt-2 pt-2 border-t border-gray-50 flex justify-between items-center">
+                            {{-- Reply Toggle --}}
+                            <button @click="zeigeAntwortBox = !zeigeAntwortBox"
+                                class="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-600 transition-colors font-medium">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                                </svg>
+                                Schnellantwort
+                            </button>
+
+                            {{-- Pfeil zur Detailseite --}}
+                            <a href="{{ route('diskussion.details', $diskussion->id) }}"
+                                class="text-gray-400 hover:text-blue-500 transition-colors flex items-center gap-1 text-xs font-medium">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+
+                        {{-- Antwort-Box --}}
+                        <div x-show="zeigeAntwortBox" x-collapse
+                            class="mt-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <form action="{{ route('diskussion.antworten', $diskussion->id) }}" method="POST">
+                                @csrf
+                                <textarea name="beitrag" rows="2" required
+                                    placeholder="Schreibe deine Antwort auf dieses Thema..."
+                                    class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 resize-none"></textarea>
+                                <div class="flex justify-end gap-2 mt-2">
+                                    <button type="button" @click="zeigeAntwortBox = false"
+                                        class="px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-200 rounded transition">Abbrechen</button>
+                                    <button type="submit"
+                                        class="px-4 py-2 bg-[#6ba9dc] hover:bg-[#5a91c4] text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+                                        Senden
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                     @empty
                     <p class="text-sm text-gray-400 mb-3">Noch keine Diskussionen.</p>
                     @endforelse
 
-                    {{-- Neues Diskussionsthema / Umfrage erstellen (Taqwa) --}}
+                    {{-- Neues Diskussionsthema erstellen (Taqwa) --}}
                     <div class="bg-white border border-gray-200 rounded-xl p-4 mt-2"
                         x-data="{ istUmfrage: false, optionen: ['',''], text: '' }">
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Neues

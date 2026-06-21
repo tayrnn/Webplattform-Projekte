@@ -1,105 +1,67 @@
 @extends('layouts.app')
+
 @section('content')
+<div class="max-w-2xl mx-auto mt-6 mb-16">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Benutzer anlegen</title>
+    {{-- Zurück-Button --}}
+    <a href="javascript:history.back()"
+       class="inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-[#0066cc] mb-4 transition-colors font-medium">  
+        ← Zurück
+    </a>
 
-<style>
-    body {
-        font-family: Arial;
-        background: #f5f5f5;
-        padding: 40px;
-    }
+    {{-- Erfolgsmeldung --}}
+    @if(session('success'))
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+        ✓ {{ session('success') }}
+    </div>
+    @endif
 
-    .container {
-        width: 100%;
-        margin: 40x auto;
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
+    {{-- Formular-Container --}}
+    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+        
+        <h2 class="text-xl font-semibold text-gray-800 mb-8 pb-3 border-b border-gray-100">
+            Benutzerverwaltung / <span class="text-[#0066cc]">Neuen Benutzer anlegen</span>
+        </h2>
 
-    input,
-    select {
-        width: 100%;
-        padding: 12px;
-        margin-top: 8px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        box-sizing: border-box;
-    }
+        <form method="POST" action="/admin/nutzer-speichern" class="space-y-5">
+            @csrf
 
-    button {
-        padding: 12px 20px;
-        background: #6ba9dc;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        margin-top: 20px;
-    }
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Vorname</label>
+                <input type="text" name="vorname" required
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066cc] focus:border-[#0066cc] outline-none transition">
+            </div>
 
-    h2 {
-        margin-bottom: 30px;
-    }
-</style>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nachname</label>
+                <input type="text" name="nachname" required
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066cc] focus:border-[#0066cc] outline-none transition">
+            </div>
 
-@if(session('success'))
-<div style="
-        background: #d4edda;
-        color: #155724;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-    ">
-    {{ session('success') }}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">E-Mail-Adresse</label>
+                <input type="email" name="email" required
+                       class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066cc] focus:border-[#0066cc] outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Rolle</label>
+                <select name="role" required
+                        class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0066cc] focus:border-[#0066cc] outline-none transition bg-white">
+                    <option value="student">Student</option>
+                    <option value="lehrender">Lehrender</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit"
+                        class="w-full bg-[#7ca3bf] hover:bg-[#6b92ae] text-white font-bold py-3 px-4 rounded-lg transition shadow-sm">
+                    Benutzer erstellen
+                </button>
+            </div>
+
+        </form>
+    </div>
 </div>
-@endif
-<div class="container">
-
-    <h2>Benutzerverwaltung / Neuen Benutzer anlegen</h2>
-
-    <form method="POST" action="/admin/nutzer-speichern">
-
-        @csrf
-
-        <div>
-            <label>Vorname</label>
-            <input type="text" name="vorname">
-        </div>
-
-        <br>
-
-        <div>
-            <label>Nachname</label>
-            <input type="text" name="nachname">
-        </div>
-
-        <br>
-
-        <div>
-            <label>E-Mail-Adresse</label>
-            <input type="email" name="email">
-        </div>
-
-        <br>
-
-        <div>
-            <label>Rolle</label>
-            <select name="role" required>
-                <option value="student">Student</option>
-                <option value="lehrender">Lehrender</option>
-                <option value="admin">Admin</option>
-            </select>
-        </div>
-
-        <button type="submit">
-            Benutzer erstellen
-        </button>
-
-    </form>
-
-</div>
-
 @endsection

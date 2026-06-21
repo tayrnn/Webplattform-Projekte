@@ -93,16 +93,29 @@ Route::put('/projekte/{id}/aktualisieren', [ProjektController::class, 'aktualisi
 Route::delete('/projekte/{id}/loeschen', [ProjektController::class, 'loeschen'])->name('projekte.loeschen');
 Route::patch('/projekte/{id}/status', [projektController::class, 'statusAendern'])->name('projekte.status');
 
-// --- BETREUUNG ---
-Route::post('/projekte/{id}/betreuung-uebernehmen', [BetreuungController::class, 'uebernehmen'])->name('betreuung.uebernehmen');
-Route::post('/projekte/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])->name('betreuung.beenden');
+// --- BEWERTUNG (Sterne) ---
+Route::post('/projekte/{id}/bewerten', [ProjektController::class, 'bewerten'])->name('projekte.bewerten');
 
-// --- DISKUSSIONEN ---
-Route::get('/projekte/{projekt}/diskussion/create', [DiskussionController::class, 'create'])->name('diskussion.create');
+// --- DISKUSSIONEN (VOLLSTÄNDIG) ---
+// Neues Thema speichern
 Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])->name('diskussion.speichern');
+
+// Diskussion-Detailseite anzeigen
 Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])->name('diskussion.details');
+
+// Diskussionsthema bearbeiten/löschen
+Route::put('/diskussion/{diskussion}/bearbeiten', [DiskussionController::class, 'bearbeiten'])->name('diskussion.bearbeiten');
+Route::delete('/diskussion/{diskussion}/loeschen', [DiskussionController::class, 'loeschen'])->name('diskussion.loeschen');
+
+// Antworten auf ein Diskussionsthema (Hauptbeiträge)
 Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])->name('diskussion.antworten');
-Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])->name('diskussion.abstimmen');
+
+// Beiträge (Antworten) bearbeiten/löschen
+Route::put('/diskussion-beitrag/{beitrag}/bearbeiten', [DiskussionController::class, 'beitragBearbeiten'])->name('diskussion.beitrag.bearbeiten');
+Route::delete('/diskussion-beitrag/{beitrag}/loeschen', [DiskussionController::class, 'beitragLoeschen'])->name('diskussion.beitrag.loeschen');
+
+// Unterantworten (Antworten auf einen bestimmten Beitrag)
+Route::post('/diskussion-beitrag/{beitrag}/unterantwort', [DiskussionController::class, 'unterantwortSpeichern'])->name('diskussion.unterantwort.speichern');
 
 // --- SUCHE --- 
 //-> alle bis auf /admin/nutzer/suchen eigentlich bei den anderen jetzt mit untergebracht, da sonst keine direkte Hervorhebung des aktuellen Tabs möglich war 
