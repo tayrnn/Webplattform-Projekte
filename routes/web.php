@@ -25,7 +25,8 @@ Route::middleware('auth')->group(function () {
 });
 
 // --- STARTSEITE ---
-Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
+//Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
+Route::get('/', [SuchenFilternController::class, 'suchen'])->name('projekte.liste');
 Route::get('/dashboard', function () {
     return view('dashboard');
 });
@@ -44,26 +45,8 @@ Route::get('/student', function () {
     $kategorien = Kategorie::all();
     return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
-Route::get('/student/alle-ideen', function () {
-    $projekte = Projekt::all();
-    $istStudent = true;
-    $istLehrender = false;
-    $istAdmin = false;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
-});
-Route::get('/student/meine-projekte', function () {
-    $projekte = Projekt::where('ersteller_id', Auth::id())->get();
-    $istStudent = true;
-    $istLehrender = false;
-    $istAdmin = false;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
-});
+Route::get('/student/alle-ideen', [SuchenFilternController::class, 'suchen'])->name('student.alle-projekte.suchen');
+Route::get('/student/meine-projekte', [SuchenFilternController::class, 'suchen'])->name('student.meine-projekte.suchen');
 Route::get('/student/neue-idee', function () {
     $kategorien = Kategorie::all();
     return view('projekte.erstellen', compact('kategorien'));
@@ -80,29 +63,11 @@ Route::get('/lehrende', function () {
     $kategorien = Kategorie::all();
     return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
 });
-Route::get('/lehrende/alle-ideen', function () {
-    $projekte = Projekt::all();
-    $istStudent = false;
-    $istLehrender = true;
-    $istAdmin = false;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
-});
-Route::get('/lehrende/betreute-projekte', [BetreuungController::class, 'index']);
+Route::get('/lehrende/alle-ideen', [SuchenFilternController::class, 'suchen'])->name('lehrende.alle-projekte.suchen');
+Route::get('/lehrende/betreute-projekte', [SuchenFilternController::class, 'suchen'])->name('lehrende.betreute-projekte.suchen');
 
 // --- ADMIN-ROUTEN ---
-Route::get('/admin', function () {
-    $projekte = Projekt::all();
-    $istStudent = false;
-    $istLehrender = false;
-    $istAdmin = true;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
-});
+Route::get('/admin', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
 Route::get('/admin/nutzer', function () {
     $projekte = collect();
     $nutzer = \App\Models\User::all();
@@ -138,10 +103,14 @@ Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])
 Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])->name('diskussion.antworten');
 Route::post('/diskussions-antwort/{antwort}/abstimmen', [DiskussionController::class, 'abstimmen'])->name('diskussion.abstimmen');
 
-// --- SUCHE ---
-Route::get('/student/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('student.projekte.suchen');
-Route::get('/lehrende/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.projekte.suchen');
-Route::get('/admin/projektideen/suchen', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
+// --- SUCHE --- 
+//-> alle bis auf /admin/nutzer/suchen eigentlich bei den anderen jetzt mit untergebracht, da sonst keine direkte Hervorhebung des aktuellen Tabs möglich war 
+//   bzw. die Hervorhebung beim Suchen/Filtern immer verloren gegangen ist (ansonsten hat es jetzt so ohne Probleme an den anderen Stellen mit funktioniert)
+Route::get('/student/alle-ideen/suchen', [SuchenFilternController::class, 'suchen'])->name('student.alle-projekte.suchen');
+Route::get('/student/meine-projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('student.meine-projekte.suchen');
+Route::get('/lehrende/alle-ideen/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.alle-projekte.suchen');
+Route::get('/lehrende/betreute-projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.betreute-projekte.suchen');
+Route::get('/admin/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
 Route::get('/admin/nutzer/suchen', [SuchenFilternController::class, 'nachNutzernSuchen'])->name('admin.nutzer.suchen');
 
 // Test-Route

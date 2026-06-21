@@ -41,24 +41,19 @@
             </a>
 
             @php
-            $zielRoute = $homeUrl; // Standardmäßig auf die Startseite setzen
-            if (Auth::check()) {
-            $rolle = Auth::user()->role;
-            if ($rolle === 'admin') {
-            //anhand der URL unterscheiden, ob normale Suche oder Nutzer-Suche für den Admin in der Nutzerverwaltung
-            $istAdminNutzerverwaltung = request()->is('admin/nutzer');
-            $zielRoute = $istAdminNutzerverwaltung ? route('admin.nutzer.suchen') : route('admin.projekte.suchen');
-            } elseif ($rolle === 'lehrender') {
-            $zielRoute = route('lehrende.projekte.suchen');
-            } elseif ($rolle === 'student') {
-            $zielRoute = route('student.projekte.suchen');
-            } else {
-            $zielRoute = $homeUrl;
-            }
-            }
+                $istAdminNutzerverwaltung = Auth::check() && Auth::user()->role === 'admin' && (request()->is('admin/nutzer*'));
+
+                $zielRoute = $istAdminNutzerverwaltung ? route('admin.nutzer.suchen') : url()->current();
             @endphp
 
             <form action="{{ $zielRoute }}" method="GET" class="relative w-[320px]">
+                {{-- vorhandene Filteroptionen mitsenden, für die Kombination von Suchbegriff und Filtern --}}
+                @foreach(request('filterStatus', []) as $status)
+                    <input type="hidden" name="filterStatus[]" value="{{ $status }}">
+                @endforeach
+                @foreach(request('filterKategorie', []) as $kategorie)
+                    <input type="hidden" name="filterKategorie[]" value="{{ $kategorie }}">
+                @endforeach
                 <input type="search" name="suche" placeholder="Suche..." value="{{ request('suche') }}"
                     class="w-full bg-white rounded-full pl-9 pr-4 py-1.5 text-sm border-none shadow-sm focus:ring-2 focus:ring-blue-400 outline-none">
                 <svg class="absolute left-3 top-2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
