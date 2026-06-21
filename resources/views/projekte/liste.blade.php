@@ -80,16 +80,16 @@
 
                                 {{-- Suchbegriff mitsenden, damit die Kombination von Suchbegriff und Filtern möglich ist --}}
                                 @if(request('suche'))
-                                    <input type="hidden" name="suche" value="{{ request('suche') }}">
+                                <input type="hidden" name="suche" value="{{ request('suche') }}">
                                 @endif
 
                                 <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Status</p>
                                 @foreach(['offen' => 'Offen', 'in_bearbeitung' => 'In Bearbeitung', 'abgeschlossen' =>
                                 'Abgeschlossen', 'betreuer_gesucht' => 'Betreuer gesucht'] as $wert => $label)
-                                @php $statusChecked = in_array($wert, $activeStatus); 
+                                @php $statusChecked = in_array($wert, $activeStatus);
                                 //sorgt dafür, dass die Variable $activeStatus den aktuellen Status des Filters korrekt wiedergibt, auch wenn mehrere Filteroptionen gleichzeitig ausgewählt sind
-                                @endphp 
-                                
+                                @endphp
+
                                 <label
                                     class="flex items-center gap-3 px-2 py-1.5 rounded-lg cursor-pointer text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                     <input type="checkbox" name="filterStatus[]" value="{{ $wert }}" class="hidden" {{-- Mehrfachauswahl ermöglichen + PHP anweisen, mehrere Werte zu übergeben --}}
@@ -98,13 +98,13 @@
                                     <span
                                         class="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 {{ $statusChecked ? 'border-[#0066cc] bg-[#0066cc]' : 'border-gray-300 bg-white' }}">
                                         @if($statusChecked)
-                                        <svg 
+                                        <svg
                                             class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                <polyline points="20 6 9 17 4 12" /> {{-- die Linie des Häkchens in der Checkbox --}}
+                                            <polyline points="20 6 9 17 4 12" /> {{-- die Linie des Häkchens in der Checkbox --}}
                                         </svg> {{-- Formatierung des Häkchens in der Checkbox --}}
-                                        @endif 
+                                        @endif
                                     </span>
-                                    {{ $label }} 
+                                    {{ $label }}
                                 </label>
                                 @endforeach
 
@@ -123,7 +123,7 @@
                                         @if($kategorieChecked)
                                         <svg
                                             class="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                                                <polyline points="20 6 9 17 4 12" /> {{-- die Linie des Häkchens in der Checkbox --}}
+                                            <polyline points="20 6 9 17 4 12" /> {{-- die Linie des Häkchens in der Checkbox --}}
                                         </svg> {{-- Formatierung des Häkchens in der Checkbox --}}
                                         @endif
                                     </span>
@@ -180,9 +180,9 @@
                 @forelse($projekte as $projekt)
                 <div>
                     <x-project-card :title="$projekt->projektname" :status="$projekt->bearbeitungsstatus"
-                        :beschreibung="$projekt->beschreibung"
-                        :needsSupervision="$projekt->bearbeitungsstatus->value === 'betreuer_gesucht'"
-                        :id="$projekt->id" :projektId="$projekt->id" :isPublic="$projekt->is_public" />
+                        :beschreibung="$projekt->beschreibung" :needsSupervision="$projekt->betreuer_id === null"
+                        :id="$projekt->id" :projektId="$projekt->id" :isPublic="$projekt->is_public"
+                        :zeigeSichtbarkeit="request()->is('student/meine-projekte')" />
                 </div>
                 @empty
                 <div class="text-center py-20 text-gray-400 col-span-3">

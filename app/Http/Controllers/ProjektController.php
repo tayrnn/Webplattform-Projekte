@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller
 {
-    /*
     // Alle Projekte anzeigen (mit Filter nach Status)
     public function liste(Request $request)
     {
@@ -49,8 +48,6 @@ class ProjektController extends Controller
             'istAdmin'
         ));
     }
-        */
-    //-> erstmal auskommentiert -> bei web.php mit der suchen-Methode aus dem SuchenFilternController ersetzt, gab sonst Fehler bei der Datenbankabfrage
 
     // Nur eigene Projekte des eingeloggten Studenten anzeigen
     public function meine(Request $request)
@@ -193,4 +190,30 @@ class ProjektController extends Controller
         return redirect()->route('projekte.liste')
             ->with('erfolg', 'Projektidee wurde erfolgreich gelöscht.');
     }
+
+    // Status eines Projekts aendern (Student & Admin)
+    public function statusAendern(Request $request, $id)
+    {
+        $projekt = Projekt::findOrFail($id);
+        
+        $istAdmin = Auth::check() && Auth::user()->role === 'admin';
+        $istStudent = Auth::check() && Auth::user()->role === 'student';
+
+        // Sicherheitspruefung
+        if (!$istAdmin && !($istStudent && $projekt->ersteller_id === Auth::id())) {
+         return redirect()->route('projekte.details', $id)
+             ->with('fehler', 'Du hast keine Berechtigung den Status zu ändern.');
+         }
+
+         $request->validate([
+             'bearbeitungsstatus' => 'required|in:offen,in_bearbeitung,abgeschlossen,betreuer_gesucht',
+         ]);
+
+         $projekt->update([
+             'bearbeitungsstatus' => $request->bearbeitungsstatus,
+         ]);
+
+         return redirect()->route('projekte.details', $id)
+         ->with('erfolg', 'Status erfolgreich geändert!');
+          }
 }

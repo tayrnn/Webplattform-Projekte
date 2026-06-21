@@ -166,6 +166,36 @@
                             ✏️ Idee bearbeiten
                         </a>
 
+                        {{-- Status aendern (Student & Admin) --}}
+                        @if($istStudent && $projekt->ersteller_id === auth()->id() || $istAdmin)
+                        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Status ändern</div>
+                            <form method="POST" action="{{ route('projekte.status', $projekt->id) }}">
+                                @csrf
+                                @method('PATCH')
+                                <select name="bearbeitungsstatus"
+                                    class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-[#0066cc] mb-3">
+                                    <option value="offen" {{ $projekt->bearbeitungsstatus === 'offen' ? 'selected' : '' }}>
+                                        Offen
+                                    </option>
+                                    <option value="in_bearbeitung" {{ $projekt->bearbeitungsstatus === 'in_bearbeitung' ? 'selected' : '' }}>
+                                        In Bearbeitung
+                                    </option>
+                                    <option value="abgeschlossen" {{ $projekt->bearbeitungsstatus === 'abgeschlossen' ? 'selected' : '' }}>
+                                        Abgeschlossen
+                                    </option>
+                                    <option value="betreuer_gesucht" {{ $projekt->bearbeitungsstatus === 'betreuer_gesucht' ? 'selected' : '' }}>
+                                        Betreuer gesucht
+                                    </option>
+                                </select>
+                                <button type="submit"
+                                    class="w-full bg-[#6ba9dc] hover:bg-[#5a91c4] text-white py-2 rounded-md text-sm font-bold transition">
+                                    Status speichern
+                                </button>
+                            </form>
+                        </div>
+                        @endif
+
                         <form method="POST" action="{{ route('projekte.loeschen', $projekt->id) }}"
                             onsubmit="return confirm('Idee wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')">
                             @csrf
