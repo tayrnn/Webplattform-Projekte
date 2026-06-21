@@ -10,12 +10,11 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         DB::table('categories')->insert([
-            ['name' => 'Webentwicklung'],
-            ['name' => 'KI'],
-            ['name' => 'Mobile App'],
-            ['name' => 'Datenbanken'],
-            ['name' => 'Design'],
-            ['name' => 'Software Engineering'],
+            ['name' => 'Angewandte Informatik- und Biowissenschaften'],
+            ['name' => 'Medien'],
+            ['name' => 'Soziale Arbeit'],
+            ['name' => 'Wirtschaftsingenieurwesen'],
+            ['name' => 'Ingenieurwissenschaften'],
         ]);
     }
 }

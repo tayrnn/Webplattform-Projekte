@@ -151,7 +151,8 @@
                 @forelse($projekte as $projekt)
                 <div>
                     <x-project-card :title="$projekt->projektname" :status="$projekt->bearbeitungsstatus"
-                        :beschreibung="$projekt->beschreibung" :needsSupervision="$projekt->betreuer_id === null"
+                        :beschreibung="$projekt->beschreibung"
+                        :needsSupervision="$projekt->bearbeitungsstatus->value === 'betreuer_gesucht'"
                         :id="$projekt->id" :projektId="$projekt->id" :isPublic="$projekt->is_public" />
                 </div>
                 @empty

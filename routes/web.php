@@ -32,6 +32,9 @@ Route::get('/dashboard', function () {
 
 // --- STUDENT-ROUTEN ---
 Route::get('/student', function () {
+    if (Auth::user()->role === 'lehrender') return redirect('/lehrende');
+    if (Auth::user()->role === 'admin') return redirect('/admin');
+
     $projekte = Projekt::all();
     $istStudent = true;
     $istLehrender = false;

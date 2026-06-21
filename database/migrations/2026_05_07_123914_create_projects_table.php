@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('projektname');
             $table->text('beschreibung')->nullable();
             $table->string('bearbeitungsstatus')->default('offen');
-            $table->integer('mitglied');
-            //prototyp 2?
+            //$table->integer('mitglied');
             // $table->string('bildpfad')->nullable();
             $table->foreignId('ersteller_id')->nullable()
                 ->constrained('users')

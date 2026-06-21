@@ -31,7 +31,7 @@ class AdminUserSeeder extends Seeder
             'username' => 'lehrer1',
             'email' => 'lehrer@test.local',
             'password' => Hash::make('lehrer12345'),
-            'role' => 'lehrende',
+            'role' => 'lehrender',
         ]);
     }
 }

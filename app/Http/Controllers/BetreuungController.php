@@ -10,9 +10,27 @@ class BetreuungController extends Controller
 {
     public function index()
     {
-        $projekte = Projekt::where('betreuer_id', Auth::id())->get();
+        $projekte = Projekt::with(['ersteller', 'kategorien'])
+            ->where('betreuer_id', Auth::id())
+            ->latest()
+            ->get();
 
-        return view('lehrende.dashboard', compact('projekte'));
+        $kategorien      = \App\Models\Projekt\Kategorie::all();
+        $istStudent      = false;
+        $istLehrender    = true;
+        $istAdmin        = false;
+        $filterKategorie = null;
+        $filterStatus    = null;
+
+        return view('projekte.liste', compact(
+            'projekte',
+            'kategorien',
+            'istStudent',
+            'istLehrender',
+            'istAdmin',
+            'filterKategorie',
+            'filterStatus'
+        ));
     }
 
     public function uebernehmen($id)

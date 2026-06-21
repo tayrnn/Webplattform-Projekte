@@ -91,16 +91,19 @@ class ProjektController extends Controller
         $validierteEingaben = $request->validate([
             'projektname'  => 'required|string|max:255',
             'beschreibung' => 'required|string',
+            'category_id'  => 'required|exists:categories,id',
         ]);
 
         // Projekt erstellen - Status wird automatisch auf "neu" gesetzt
-        Projekt::create([
+        $projekt = Projekt::create([
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => Bearbeitungsstatus::Offen,
             'ersteller_id'            => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
+
+        $projekt->kategorien()->attach($validierteEingaben['category_id']);
 
         return redirect()->route('projekte.liste')
             ->with('erfolg', 'Deine Projektidee wurde erfolgreich eingereicht!');

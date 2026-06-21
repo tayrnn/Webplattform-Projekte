@@ -179,16 +179,41 @@
                     @endif
 
                     {{-- Betreuung übernehmen, für Lehrende (Tayrit) --}}
-                    @if(Auth::check() && Auth::user()->role === 'lehrende' && $projekt->betreuer_id === null)
-                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    @if(Auth::check() && Auth::user()->role === 'lehrender' && $projekt->betreuer_id === null)
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm"
+                        x-data="{ modalOffen: false }">
                         <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Betreuung</div>
-                        <form method="POST" action="{{ route('betreuung.uebernehmen', $projekt->id) }}">
-                            @csrf
-                            <button type="submit" onclick="return confirm('Möchten Sie dieses Projekt betreuen?')"
-                                class="w-full bg-blue-500 text-white py-2 rounded-md text-sm font-bold hover:bg-blue-600 transition">
-                                Betreuung übernehmen
-                            </button>
-                        </form>
+
+                        <button type="button" @click="modalOffen = true"
+                            class="w-full bg-[#6ba9dc] text-white py-2 rounded-md text-sm font-bold hover:bg-[#5a91c4] transition">
+                            Betreuung übernehmen
+                        </button>
+
+                        {{-- Modal-Overlay --}}
+                        <div x-show="modalOffen" x-cloak
+                            class="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+                            x-transition.opacity>
+                            <div class="bg-white rounded-xl shadow-lg max-w-sm w-full p-6"
+                                @click.outside="modalOffen = false">
+                                <h3 class="text-lg font-bold text-[#1a202c] mb-2">Projekt betreuen?</h3>
+                                <p class="text-sm text-gray-500 mb-6">Möchten Sie dieses Projekt betreuen?</p>
+
+                                <div class="flex gap-3">
+                                    <form method="POST" action="{{ route('betreuung.uebernehmen', $projekt->id) }}"
+                                        class="flex-1">
+                                        @csrf
+                                        <button type="submit"
+                                            class="w-full bg-[#6ba9dc] text-white py-2 rounded-md text-sm font-bold hover:bg-[#5a91c4] transition">
+                                            Ja, übernehmen
+                                        </button>
+                                    </form>
+                                    <button type="button" @click="modalOffen = false"
+                                        class="flex-1 border border-gray-300 text-gray-600 py-2 rounded-md text-sm font-bold hover:bg-gray-50 transition">
+                                        Abbrechen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     @endif
 

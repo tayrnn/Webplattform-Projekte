@@ -27,6 +27,8 @@ class Projekt extends Model
         'bearbeitungsstatus', // offen, geschlossen
         'bildpfad',
         'ersteller_id',
+        'betreuer_id',
+        'is_public',
     ];
 
     protected function casts(): array
