@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 
 class SuchenFilternController extends Controller
 {
-    public function suchen(Request $request) 
-    {   
+    public function suchen(Request $request)
+    {
         $kategorien = Kategorie::all();
         $istStudent = Auth::check() && Auth::user()->role === 'student';
         $istLehrender = Auth::check() && Auth::user()->role === 'lehrender';
@@ -29,7 +29,7 @@ class SuchenFilternController extends Controller
         $dataPool = Projekt::with('ersteller', 'kategorien'); //Datenbankbeziehung zwischen Projekt, Ersteller und Kategorie schon direkt mit laden (Datenbankabfrage muss dann nur zweimal durchgeführt werden)
 
         //Unterscheidung des Datenpools je nach Rolle und ausgewähltem Tab
-        
+
         //Fall 1: Student
         if ($istStudent) {
             if (str_contains($pfad, 'meine-projekte')) {
@@ -50,21 +50,25 @@ class SuchenFilternController extends Controller
 
         //Fall 3: Admin
         if ($istAdmin) {
-            $dataPool->where('projects.is_public', 1);
+            if (str_contains($pfad, 'meine-projekte')) {
+                $dataPool->where('projects.ersteller_id', Auth::user()->id);
+            } else {
+                $dataPool->where('projects.is_public', 1);
+            }
         }
-        
+
         $projekte = $dataPool
             //Bestandteil 1: Suchfunktion
             ->when($suchbegriff, function ($query) use ($suchbegriff) { //Suche nur durchführen, wenn ein Suchbegriff eingegeben wurde
                 $query->where(function ($subQuery) use ($suchbegriff) { //Klammerung der Suchfunktion, damit die Filterfunktionen später nicht von der Suche beeinflusst werden
                     //Rückgabe von Projekten anhand der Übereinstimmung mit dem Suchbegriff selektieren
-                    $subQuery->where('projektname', 'LIKE', '%'.$suchbegriff.'%') 
-                             //über die Beziehung von Projekt belongsTo Ersteller (Name: ersteller) auf die Tabelle der Nutzer zugreifen
-                             //in der Tabelle der Nutzer mit dem Suchbegriff nach Erstellern suchen (Suchbegriff muss für die Funktion übergeben werden)
-                             ->orWhereHas('ersteller', function ($userQuery) use ($suchbegriff) {
-                                //Rückgabe von Projekten anhand der Übereinstimmung des Suchbegriffes mit deren Ersteller selektieren
-                                $userQuery->where('users.name', 'LIKE', '%'.$suchbegriff.'%');
-                            });
+                    $subQuery->where('projektname', 'LIKE', '%' . $suchbegriff . '%')
+                        //über die Beziehung von Projekt belongsTo Ersteller (Name: ersteller) auf die Tabelle der Nutzer zugreifen
+                        //in der Tabelle der Nutzer mit dem Suchbegriff nach Erstellern suchen (Suchbegriff muss für die Funktion übergeben werden)
+                        ->orWhereHas('ersteller', function ($userQuery) use ($suchbegriff) {
+                            //Rückgabe von Projekten anhand der Übereinstimmung des Suchbegriffes mit deren Ersteller selektieren
+                            $userQuery->where('users.name', 'LIKE', '%' . $suchbegriff . '%');
+                        });
                 });
             })
             //Bestandteil 2: Filterfunktion für die Kategorien
@@ -89,18 +93,18 @@ class SuchenFilternController extends Controller
             'istLehrender',
             'istAdmin',
             'suchbegriff'
-        )); 
+        ));
     }
 
     public function nachNutzernSuchen(Request $request)
     {
         $suchbegriff = $request->suche;
 
-        $nutzer = User::where('name', 'LIKE', '%'.$suchbegriff.'%')->get();
+        $nutzer = User::where('name', 'LIKE', '%' . $suchbegriff . '%')->get();
 
         $projekte = collect(); //leere Collection, da hier nur die Nutzer zurückgegeben werden sollen
         $filterKategorie = null; //keine Filteroptionen für die Nutzerverwaltung
-        $filterStatus = null; 
+        $filterStatus = null;
         $istStudent = Auth::check() && Auth::user()->role === 'student';
         $istLehrender = Auth::check() && Auth::user()->role === 'lehrender';
         $istAdmin = Auth::check() && Auth::user()->role === 'admin';
@@ -109,14 +113,13 @@ class SuchenFilternController extends Controller
         return view('projekte.liste', compact(
             'projekte',
             'kategorien',
-            'nutzer', 
+            'nutzer',
             'filterKategorie',
             'filterStatus',
             'istStudent',
-            'istLehrender', 
+            'istLehrender',
             'istAdmin',
             'suchbegriff'
         ));
     }
-
 }

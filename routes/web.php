@@ -82,6 +82,7 @@ Route::get('/admin/nutzer', function () {
 Route::get('/admin/nutzer/neu', [NutzerController::class, 'benutzerAnlegen']);
 Route::post('/admin/nutzer-speichern', [NutzerController::class, 'speichern']);
 Route::delete('/admin/nutzer/{id}/loeschen', [NutzerController::class, 'loeschen'])->name('admin.nutzer.loeschen');
+Route::get('/admin/meine-projekte', [SuchenFilternController::class, 'suchen'])->name('admin.meine-projekte.suchen');
 
 // --- PROJEKTE ---
 Route::get('/projekte/meine', [ProjektController::class, 'meine'])->name('projekte.meine');

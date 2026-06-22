@@ -175,6 +175,7 @@
                         <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
                             <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Status ändern
                             </div>
+                            @endif
                             <form method="POST" action="{{ route('projekte.status', $projekt->id) }}">
                                 @csrf
                                 @method('PATCH')
@@ -291,7 +292,7 @@
             </div>
 
             {{-- ===== DISKUSSIONEN & UMFRAGEN: Taqwa ===== --}}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6 items-start">
 
                 {{-- Diskussionen (Taqwa) --}}
                 <div class="flex flex-col">
