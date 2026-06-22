@@ -9,8 +9,10 @@ use App\Models\Projekt\Projekt;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BetreuungController;
 use App\Models\Projekt\Kategorie;
-use App\Http\Controllers\DiskussionController;
 use App\Http\Controllers\SuchenFilternController;
+use App\Http\Controllers\DiskussionenController;
+use App\Http\Controllers\UmfrageController;
+use App\Http\Controllers\BewertungsController;
 
 // --- AUTH ---
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -97,26 +99,25 @@ Route::patch('/projekte/{id}/status', [projektController::class, 'statusAendern'
 // --- BEWERTUNG (Sterne) ---
 Route::post('/projekte/{id}/bewerten', [ProjektController::class, 'bewerten'])->name('projekte.bewerten');
 
-// --- DISKUSSIONEN (VOLLSTÄNDIG) ---
-// Neues Thema speichern
-Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionController::class, 'speichern'])->name('diskussion.speichern');
+// --- NEUE PROJEKT-DETAILANSICHT MIT DISKUSSION, UMFRAGE & STERNEN ---
 
-// Diskussion-Detailseite anzeigen
-Route::get('/diskussion/{diskussion}', [DiskussionController::class, 'details'])->name('diskussion.details');
+// 1. Das kombinierte Frontend-Layout (Hauptseite)
+Route::get('/projekt/{id}/diskussionen', [DiskussionenController::class, 'anzeigen'])->name('projekt.diskussionen');
 
-// Diskussionsthema bearbeiten/löschen
-Route::put('/diskussion/{diskussion}/bearbeiten', [DiskussionController::class, 'bearbeiten'])->name('diskussion.bearbeiten');
-Route::delete('/diskussion/{diskussion}/loeschen', [DiskussionController::class, 'loeschen'])->name('diskussion.loeschen');
+// 2. Diskussionen & Kommentare
+Route::post('/projekte/{projekt}/diskussion/speichern', [DiskussionenController::class, 'diskussionSpeichern'])->name('diskussion.speichern');
+Route::post('/projekt/{diskussion}/beitrag', [DiskussionenController::class, 'beitragSpeichern'])->name('beitrag.speichern');
+Route::post('/beitrag/{beitrag}/antwort', [DiskussionenController::class, 'antwortSpeichern'])->name('antwort.speichern');
+Route::delete('/beitrag/{id}/loeschen', [DiskussionenController::class, 'beitragLoeschen'])->name('beitrag.loeschen');
+Route::delete('/projekt/{projektId}/diskussion/loeschen', [DiskussionenController::class, 'diskussionLoeschen'])->name('diskussion.loeschen');
 
-// Antworten auf ein Diskussionsthema (Hauptbeiträge)
-Route::post('/diskussion/{diskussion}/antworten', [DiskussionController::class, 'antworten'])->name('diskussion.antworten');
+// 3. Umfragen
+Route::post('/projekt/{projektId}/abstimmen', [UmfrageController::class, 'abstimmen'])->name('umfrage.abstimmen');
+Route::delete('/projekt/{projektId}/stimme-zurueckziehen', [UmfrageController::class, 'stimmeLoeschen'])->name('umfrage.loeschen');
 
-// Beiträge (Antworten) bearbeiten/löschen
-Route::put('/diskussion-beitrag/{beitrag}/bearbeiten', [DiskussionController::class, 'beitragBearbeiten'])->name('diskussion.beitrag.bearbeiten');
-Route::delete('/diskussion-beitrag/{beitrag}/loeschen', [DiskussionController::class, 'beitragLoeschen'])->name('diskussion.beitrag.loeschen');
-
-// Unterantworten (Antworten auf einen bestimmten Beitrag)
-Route::post('/diskussion-beitrag/{beitrag}/unterantwort', [DiskussionController::class, 'unterantwortSpeichern'])->name('diskussion.unterantwort.speichern');
+// 4. Sternebewertungen
+Route::post('/projekt/{projektId}/bewerten', [BewertungsController::class, 'bewerten'])->name('bewertung.speichern');
+Route::delete('/projekt/{projektId}/bewertung-entfernen', [BewertungsController::class, 'bewertungLoeschen'])->name('bewertung.loeschen');
 
 // --- SUCHE --- 
 //-> alle bis auf /admin/nutzer/suchen eigentlich bei den anderen jetzt mit untergebracht, da sonst keine direkte Hervorhebung des aktuellen Tabs möglich war 

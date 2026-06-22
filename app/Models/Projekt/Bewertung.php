@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bewertung extends Model {
 
+    protected $table = 'bewertungen';
+
     protected $fillable = [
         'projekt_id',
         'nutzer_id',
@@ -35,5 +37,4 @@ class Bewertung extends Model {
     public static function isValidSterne($sterne): bool {
         return is_int($sterne) && $sterne >= 1 && $sterne <= 5;
     }
-    
 }

@@ -15,19 +15,23 @@ class Diskussionsantwort extends Model
         'discussion_id',
         'user_id',
         'content',
-        'ist_umfrage'
+        'parent_id' // NULL -> Hauptkommentar, sonst Antwort
     ];
 
     protected $casts = [
-        'ist_umfrage' => 'boolean',
+        'deleted_at' => 'datetime',
+        'edited_at' => 'datetime',
     ];
 
     /**
-     * Der Nutzer, der diesen Beitrag verfasst hat.
+     * Der Nutzer, der diese Antwort verfasst hat.
      */
     public function ersteller(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Nutzer::class, 'user_id')
+            ->withDefault([
+                'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
+            ]);
     }
 
     /**
@@ -39,26 +43,25 @@ class Diskussionsantwort extends Model
     }
 
     /**
-     * Die Antwortoptionen, falls dieser Beitrag eine Umfrage ist.
+     * Alle Antworten, die auf diese Antwort antworten.
      */
-    public function umfrageOptionen(): HasMany
+    public function unterantworten(): HasMany
     {
-        return $this->hasMany(UmfrageOption::class, 'discussion_answer_id');
+        return $this->hasMany(self::class, 'parent_id')
+            ->orderBy('created_at', 'asc');
     }
 
-    /**
-     * Alle abgegebenen Stimmen für diese spezifische Umfrage.
-     */
-    public function stimmen(): HasMany
+    public function darfBearbeiten($user): bool
     {
-        return $this->hasMany(UmfrageStimme::class, 'discussion_answer_id');
+        return $user && $user->id === $this->user_id;
     }
 
-    /**
-     * Hilfsmethode: Prüfen, ob ein bestimmter Nutzer bereits abgestimmt hat.
-     */
-    public function hatNutzerAbgestimmt($nutzerId): bool
+    public function darfLoeschen($user): bool
     {
-        return $this->stimmen()->where('user_id', $nutzerId)->exists();
+        // Admin darf alles, Ersteller darf seine eigenen, Diskussion-Ersteller/Projekt-Inhaber dürfen auch
+        return $user->isAdmin() ||
+            $user->id === $this->user_id ||
+            $user->id === $this->diskussion->user_id ||
+            $user->id === $this->diskussion->projekt->user_id;
     }
 }

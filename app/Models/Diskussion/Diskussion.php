@@ -13,9 +13,9 @@ class Diskussion extends Model
     protected $table = 'discussions';
 
     protected $fillable = [
-        'title',
         'project_id',
-        'user_id'
+        'user_id',
+        'title',
     ];
 
     /**
@@ -23,7 +23,10 @@ class Diskussion extends Model
      */
     public function ersteller(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Nutzer::class, 'user_id')
+            ->withDefault([
+                'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
+            ]);
     }
 
     /**
@@ -35,7 +38,7 @@ class Diskussion extends Model
     }
 
     /**
-     * Alle Beiträge/Antworten innerhalb dieses Diskussionsthemas.
+     * Alle Beiträge/Antworten chronologisch innerhalb dieses Diskussionsthemas.
      */
     public function antworten(): HasMany
     {
