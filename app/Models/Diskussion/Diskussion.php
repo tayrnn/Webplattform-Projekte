@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use App\Models\Projekt\Projekt;
+use App\Models\Nutzer\Nutzer;
 
 class Diskussion extends Model
 {
@@ -23,7 +24,7 @@ class Diskussion extends Model
      */
     public function ersteller(): BelongsTo
     {
-        return $this->belongsTo(Nutzer::class, 'user_id')
+        return $this->belongsTo(User::class, 'user_id')
             ->withDefault([
                 'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
             ]);

@@ -19,13 +19,18 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained('users')
                 ->onDelete('cascade');
+            $table->foreignId('parent_id')
+                ->nullable()
+                ->constrained('discussion_answers')
+                ->onDelete('cascade');
             $table->text('content');
 
             $table->boolean('ist_umfrage')->default(false);
-            
+
+            $table->timestamp('deleted_at')->nullable();
+            $table->timestamp('edited_at')->nullable();
 
             $table->timestamps();
-
         });
     }
 
@@ -36,5 +41,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('discussion_answers');
     }
-    
 };

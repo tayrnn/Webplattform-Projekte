@@ -91,16 +91,19 @@ class ProjektController extends Controller
         $validierteEingaben = $request->validate([
             'projektname'  => 'required|string|max:255',
             'beschreibung' => 'required|string',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         // Projekt erstellen - Status wird automatisch auf "neu" gesetzt
-        Projekt::create([
+        $projekt = Projekt::create([
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => Bearbeitungsstatus::Offen,
             'ersteller_id'            => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
+
+        $projekt->kategorien()->attach($validierteEingaben['category_id']);
 
         return redirect()->route('projekte.liste')
             ->with('erfolg', 'Deine Projektidee wurde erfolgreich eingereicht!');
@@ -121,11 +124,27 @@ class ProjektController extends Controller
         $istLehrender = Auth::check() && Auth::user()->role === 'lehrender';
         $istAdmin     = Auth::check() && Auth::user()->role === 'admin';
 
+        $sterneDurchschnitt = $projekt->bewertungen()->avg('sterne') ?? 0;
+        $anzahlBewertungen = $projekt->bewertungen()->count();
+
+        $verteilung = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $verteilung[$i] = $projekt->bewertungen()->where('sterne', $i)->count();
+        }
+
+        $eigeneBewertung = Auth::check()
+            ? optional($projekt->bewertungen()->where('nutzer_id', Auth::id())->first())->sterne
+            : null;
+
         return view('projekte.details', compact(
             'projekt',
             'istStudent',
             'istLehrender',
-            'istAdmin'
+            'istAdmin',
+            'sterneDurchschnitt',
+            'anzahlBewertungen',
+            'verteilung',
+            'eigeneBewertung'
         ));
     }
 
@@ -195,25 +214,25 @@ class ProjektController extends Controller
     public function statusAendern(Request $request, $id)
     {
         $projekt = Projekt::findOrFail($id);
-        
+
         $istAdmin = Auth::check() && Auth::user()->role === 'admin';
         $istStudent = Auth::check() && Auth::user()->role === 'student';
 
         // Sicherheitspruefung
         if (!$istAdmin && !($istStudent && $projekt->ersteller_id === Auth::id())) {
-         return redirect()->route('projekte.details', $id)
-             ->with('fehler', 'Du hast keine Berechtigung den Status zu ändern.');
-         }
+            return redirect()->route('projekte.details', $id)
+                ->with('fehler', 'Du hast keine Berechtigung den Status zu ändern.');
+        }
 
-         $request->validate([
-             'bearbeitungsstatus' => 'required|in:offen,in_bearbeitung,abgeschlossen,betreuer_gesucht',
-         ]);
+        $request->validate([
+            'bearbeitungsstatus' => 'required|in:offen,in_bearbeitung,abgeschlossen,betreuer_gesucht',
+        ]);
 
-         $projekt->update([
-             'bearbeitungsstatus' => $request->bearbeitungsstatus,
-         ]);
+        $projekt->update([
+            'bearbeitungsstatus' => $request->bearbeitungsstatus,
+        ]);
 
-         return redirect()->route('projekte.details', $id)
-         ->with('erfolg', 'Status erfolgreich geändert!');
-          }
+        return redirect()->route('projekte.details', $id)
+            ->with('erfolg', 'Status erfolgreich geändert!');
+    }
 }

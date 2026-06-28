@@ -38,14 +38,7 @@ Route::get('/student', function () {
     if (Auth::user()->role === 'lehrender') return redirect('/lehrende');
     if (Auth::user()->role === 'admin') return redirect('/admin');
 
-    $projekte = Projekt::all();
-    $istStudent = true;
-    $istLehrender = false;
-    $istAdmin = false;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+    return redirect()->route('student.alle-projekte.suchen');
 });
 Route::get('/student/alle-ideen', [SuchenFilternController::class, 'suchen'])->name('student.alle-projekte.suchen');
 Route::get('/student/meine-projekte', [SuchenFilternController::class, 'suchen'])->name('student.meine-projekte.suchen');
@@ -56,14 +49,8 @@ Route::get('/student/neue-idee', function () {
 
 // --- LEHRENDE-ROUTEN ---
 Route::get('/lehrende', function () {
-    $projekte = Projekt::all();
-    $istStudent = false;
-    $istLehrender = true;
-    $istAdmin = false;
-    $filterKategorie = null;
-    $filterStatus = null;
-    $kategorien = Kategorie::all();
-    return view('projekte.liste', compact('projekte', 'istStudent', 'istLehrender', 'istAdmin', 'filterKategorie', 'filterStatus', 'kategorien'));
+
+    return redirect()->route('lehrende.alle-projekte.suchen');
 });
 Route::get('/lehrende/alle-ideen', [SuchenFilternController::class, 'suchen'])->name('lehrende.alle-projekte.suchen');
 Route::get('/lehrende/betreute-projekte', [SuchenFilternController::class, 'suchen'])->name('lehrende.betreute-projekte.suchen');
@@ -110,11 +97,17 @@ Route::post('/projekt/{diskussion}/beitrag', [DiskussionenController::class, 'be
 Route::post('/beitrag/{beitrag}/antwort', [DiskussionenController::class, 'antwortSpeichern'])->name('antwort.speichern');
 Route::delete('/beitrag/{id}/loeschen', [DiskussionenController::class, 'beitragLoeschen'])->name('beitrag.loeschen');
 Route::delete('/projekt/{projektId}/diskussion/loeschen', [DiskussionenController::class, 'diskussionLoeschen'])->name('diskussion.loeschen');
+Route::put(
+    '/beitrag/{id}/bearbeiten',
+    [DiskussionenController::class, 'beitragBearbeiten']
+)
+    ->name('diskussion.bearbeiten');
 
 // 3. Umfragen
 Route::post('/projekt/{projektId}/abstimmen', [UmfrageController::class, 'abstimmen'])->name('umfrage.abstimmen');
 Route::delete('/projekt/{projektId}/stimme-zurueckziehen', [UmfrageController::class, 'stimmeLoeschen'])->name('umfrage.loeschen');
-
+Route::delete('/projekt/{projektId}/stimme-zurueckziehen', [UmfrageController::class, 'stimmeLoeschen'])->name('umfrage.stimme.loeschen');
+Route::delete('/umfrage/{umfrageId}/loeschen', [UmfrageController::class, 'umfrageLoeschen'])->name('umfrage.loeschen');
 // 4. Sternebewertungen
 Route::post('/projekt/{projektId}/bewerten', [BewertungsController::class, 'bewerten'])->name('bewertung.speichern');
 Route::delete('/projekt/{projektId}/bewertung-entfernen', [BewertungsController::class, 'bewertungLoeschen'])->name('bewertung.loeschen');
@@ -128,6 +121,11 @@ Route::get('/lehrende/alle-ideen/suchen', [SuchenFilternController::class, 'such
 Route::get('/lehrende/betreute-projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('lehrende.betreute-projekte.suchen');
 Route::get('/admin/projekte/suchen', [SuchenFilternController::class, 'suchen'])->name('admin.projekte.suchen');
 Route::get('/admin/nutzer/suchen', [SuchenFilternController::class, 'nachNutzernSuchen'])->name('admin.nutzer.suchen');
+
+
+// Betreuung von Projekten
+Route::post('/projekt/{id}/betreuen', [BetreuungController::class, 'uebernehmen'])->name('betreuung.uebernehmen');
+Route::post('/projekt/{id}/betreuung-beenden', [BetreuungController::class, 'beenden'])->name('betreuung.beenden');
 
 // Test-Route
 Route::get('/test', function () {

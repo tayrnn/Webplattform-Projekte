@@ -14,7 +14,7 @@
 
             {{-- Obere Leiste (Akshata) --}}
             <div class="flex justify-between items-end border-b border-gray-300 mb-8 pb-3">
-                <a href="{{ route('projekte.liste') }}"
+                <a href="{{ session('letzte_projektliste', route('projekte.liste'))}}"
                     class="font-bold text-lg transition-colors text-gray-400 hover:text-[#0066cc]">
                     ← Zurück
                 </a>
@@ -99,7 +99,7 @@
                         <div class="flex items-center gap-3 flex-wrap">
                             {{-- Durchschnitt (Taqwa) --}}
                             <span class="text-base font-semibold text-gray-800">
-                                {{ number_format($durchschnitt ?? 0, 1, ',', '') }} Ø
+                                {{ number_format($sterneDurchschnitt ?? 0, 1, ',', '') }} Ø
                             </span>
 
                             {{-- Klickbare Sterne mit Alpine.js (Taqwa) --}}
@@ -122,10 +122,10 @@
                                 </div>
 
                                 {{-- Speichern-Button erscheint nur nach Auswahl (Taqwa)--}}
-                                <form action="{{ route('projekte.bewerten', $projekt->id) }}" method="POST"
+                                <form action="{{ route('bewertung.speichern', $projekt->id) }}" method="POST"
                                     x-show="selected > 0 && !saved" style="display:none">
                                     @csrf
-                                    <input type="hidden" name="bewertung" :value="selected">
+                                    <input type="hidden" name="sterne" :value="selected">
                                     <button type="submit" @click="saved = true"
                                         class="text-xs px-3 py-1  bg-[#6ba9dc] hover:bg-[#5a91c4]  text-white transition font-medium">
                                         Speichern
@@ -146,7 +146,7 @@
                                 <span>2★ {{ $verteilung[2] ?? 0 }}</span>
                                 <span>1★ {{ $verteilung[1] ?? 0 }}</span>
                             </span>
-                            <span class="text-xs text-gray-400">{{ $gesamt ?? 0 }} Stimmen</span>
+                            <span class="text-xs text-gray-400">{{ $anzahlBewertungen ?? 0 }} Stimmen</span>
                         </div>
                     </div>
 
@@ -268,22 +268,20 @@
                                     {{ $projekt->kategorien->pluck('name')->implode(', ') ?: '—' }}
                                 </span>
                             </div>
-                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <div
+                                class="flex justify-between items-center py-2 {{ $projekt->betreuer_id ? 'border-b border-gray-100' : '' }}">
                                 <span class="text-gray-400">Status</span>
                                 <span class="px-2 py-1 text-xs font-bold uppercase rounded-full {{ $statusColor }}">
                                     {{ $statusLabel }}
                                 </span>
                             </div>
-                            <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                                <span class="text-gray-400">Eingereicht von</span>
-                                <span class="font-semibold text-gray-700">{{ $projekt->ersteller->name ?? '—' }}</span>
-                            </div>
+
+                            @if($projekt->betreuer_id)
                             <div class="flex justify-between items-center py-2">
-                                <span class="text-gray-400">Datum</span>
-                                <span class="font-semibold text-gray-700">
-                                    {{ \Carbon\Carbon::parse($projekt->created_at)->format('d.m.Y') }}
-                                </span>
+                                <span class="text-gray-400">Betreut von</span>
+                                <span class="font-semibold text-gray-700">{{ $projekt->betreuer->name ?? '—' }}</span>
                             </div>
+                            @endif
                         </div>
                     </div>
 
@@ -301,7 +299,12 @@
                         💬 Diskussionen
                     </h2>
 
-                    @forelse($projekt->diskussionen->where('ist_umfrage', false) as $diskussion)
+                    @php
+                    $nurDiskussionen = $projekt->diskussionen->filter(function ($d) {
+                    return !\App\Models\Diskussion\Umfrage::where('discussion_id', $d->id)->exists();
+                    });
+                    @endphp
+                    @forelse($nurDiskussionen as $diskussion)
                     <div class="bg-white border border-gray-200 rounded-xl p-4 mb-3 relative"
                         x-data="{ menuOpen: false, editDiscussion: false, zeigeAntwortBox: false }">
 
@@ -325,7 +328,7 @@
                                     @endif
 
                                     {{-- Löschen für Autor UND Admin --}}
-                                    <form action="{{ route('diskussion.loeschen', $diskussion->id) }}" method="POST"
+                                    <form action="{{ route('diskussion.loeschen', $projekt->id) }}" method="POST"
                                         onsubmit="return confirm('Thema wirklich löschen?')">
                                         @csrf @method('DELETE')
                                         <button type="submit"
@@ -368,7 +371,7 @@
                             </button>
 
                             {{-- Pfeil zur Detailseite --}}
-                            <a href="{{ route('diskussion.details', $diskussion->id) }}"
+                            <a href="{{ route('projekt.diskussionen', $projekt->id) }}"
                                 class="text-gray-400 hover:text-blue-500 transition-colors flex items-center gap-1 text-xs font-medium">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                     stroke-width="3">
@@ -380,7 +383,7 @@
                         {{-- Antwort-Box --}}
                         <div x-show="zeigeAntwortBox" x-collapse
                             class="mt-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                            <form action="{{ route('diskussion.antworten', $diskussion->id) }}" method="POST">
+                            <form action="{{ route('beitrag.speichern', $diskussion->id) }}" method="POST">
                                 @csrf
                                 <textarea name="beitrag" rows="2" required
                                     placeholder="Schreibe deine Antwort auf dieses Thema..."
@@ -409,15 +412,13 @@
                             <textarea name="titel" x-model="text" placeholder="Thema eingeben..." rows="3"
                                 class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 text-gray-700 placeholder-gray-300 mb-3"></textarea>
 
-                            <label class="flex items-center gap-2 cursor-pointer mb-3"
-                                @click="istUmfrage = !istUmfrage">
+                            <label class="flex items-center gap-2 cursor-pointer mb-3">
                                 <div class="relative w-8 h-4 rounded-full transition-colors flex-shrink-0"
                                     :class="istUmfrage ? 'bg-blue-500' : 'bg-gray-200'">
                                     <div class="absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform"
                                         :style="istUmfrage ? 'transform:translateX(17px);left:0' : 'left:2px'"></div>
                                 </div>
-                                <input type="checkbox" name="ist_umfrage" value="1" :checked="istUmfrage"
-                                    class="hidden">
+                                <input type="checkbox" name="ist_umfrage" value="1" x-model="istUmfrage" class="hidden">
                                 <span class="text-sm text-gray-500">Als Umfrage erstellen</span>
                             </label>
 
@@ -451,6 +452,14 @@
                 </div>
 
                 {{-- Umfragen (Taqwa) --}}
+                @php
+                $alleUmfragen = \App\Models\Diskussion\Umfrage::with(['ersteller', 'optionen.stimmen'])
+                ->whereHas('discussion', function ($q) use ($projekt) {
+                $q->where('project_id', $projekt->id);
+                })
+                ->where('ist_umfrage', true)
+                ->get();
+                @endphp
                 <div>
                     <h2
                         class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-1.5">
@@ -459,15 +468,39 @@
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        Umfragen ({{ $projekt->diskussionen->where('ist_umfrage', true)->count() }})
+                        Umfragen ({{ $alleUmfragen->count() }})
                     </h2>
-                    @forelse($projekt->diskussionen->where('ist_umfrage', true) as $umfrage)
-                    @php $gesamtStimmen = $umfrage->stimmen->count(); @endphp
-                    <div class="bg-white border border-gray-200 rounded-xl p-4 mb-3">
-                        <p class="text-sm font-medium text-gray-800 mb-3">{{ $umfrage->title }}</p>
-                        @foreach($umfrage->umfrageOptionen as $option)
+                    @forelse($alleUmfragen as $umfrage)
+                    @php
+                    $gesamtStimmen = $umfrage->stimmen->count();
+                    $hatAbgestimmt = auth()->check() && $umfrage->hatNutzerAbgestimmt(auth()->id());
+                    @endphp
+                    <div class="bg-white border border-gray-200 rounded-xl p-4 mb-3" x-data="{ menuOpen: false }">
+                        <div class="flex justify-between items-start mb-3">
+                            <p class="text-sm font-medium text-gray-800">{{ $umfrage->content }}</p>
+                            @if(auth()->check() && (auth()->id() === $umfrage->user_id || auth()->user()->role ===
+                            'admin'))
+                            <div class="relative">
+                                <button @click="menuOpen = !menuOpen"
+                                    class="text-gray-400 hover:text-gray-600 text-lg leading-none">⋮</button>
+                                <div x-show="menuOpen" @click.away="menuOpen = false" style="display:none"
+                                    class="absolute right-0 mt-1 w-28 bg-white border border-gray-200 rounded-lg shadow-lg z-10 overflow-hidden">
+                                    <form action="{{ route('umfrage.loeschen', $umfrage->id) }}" method="POST"
+                                        onsubmit="return confirm('Umfrage wirklich löschen?')">
+                                        @csrf @method('DELETE')
+                                        <button type="submit"
+                                            class="block w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-gray-100">🗑
+                                            Löschen</button>
+                                    </form>
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+
+                        @if($hatAbgestimmt || !auth()->check())
+                        @foreach($umfrage->optionen as $option)
                         @php
-                        $cnt = $umfrage->stimmen->where('poll_option_id', $option->id)->count();
+                        $cnt = $option->stimmen->count();
                         $pct = $gesamtStimmen > 0 ? round($cnt / $gesamtStimmen * 100) : 0;
                         @endphp
                         <div class="flex items-center gap-2 text-sm mb-2">
@@ -479,6 +512,24 @@
                             <span class="text-xs text-gray-400 w-5 text-right">{{ $cnt }}</span>
                         </div>
                         @endforeach
+                        @else
+                        <form action="{{ route('umfrage.abstimmen', $umfrage->id) }}" method="POST">
+                            @csrf
+                            @foreach($umfrage->optionen as $option)
+                            <label
+                                class="flex items-center gap-2 text-sm mb-2 cursor-pointer hover:bg-gray-50 rounded-lg p-1.5">
+                                <input type="radio" name="option_id" value="{{ $option->id }}" required
+                                    class="text-blue-500 focus:ring-blue-400">
+                                <span class="text-gray-700 text-xs flex-1">{{ $option->option_text }}</span>
+                            </label>
+                            @endforeach
+                            <button type="submit"
+                                class="mt-2 text-xs px-3 py-1.5 bg-[#6ba9dc] hover:bg-[#5a91c4] text-white rounded-md font-medium transition">
+                                Abstimmen
+                            </button>
+                        </form>
+                        @endif
+
                         <p class="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-100">
                             {{ $gesamtStimmen }} Stimmen
                         </p>

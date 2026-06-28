@@ -28,7 +28,7 @@ class Diskussionsantwort extends Model
      */
     public function ersteller(): BelongsTo
     {
-        return $this->belongsTo(Nutzer::class, 'user_id')
+        return $this->belongsTo(User::class, 'user_id')
             ->withDefault([
                 'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
             ]);

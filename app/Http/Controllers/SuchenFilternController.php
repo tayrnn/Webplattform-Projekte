@@ -12,6 +12,9 @@ class SuchenFilternController extends Controller
 {
     public function suchen(Request $request)
     {
+
+        session(['letzte_projektliste' => $request->fullUrl()]);
+
         $kategorien = Kategorie::all();
         $istStudent = Auth::check() && Auth::user()->role === 'student';
         $istLehrender = Auth::check() && Auth::user()->role === 'lehrender';

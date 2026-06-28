@@ -12,8 +12,8 @@ class UmfrageStimme extends Model
     protected $table = 'poll_votes';
 
     protected $fillable = [
-        'poll_id',
-        'user_id', 
+        'discussion_answer_id',
+        'user_id',
         'poll_option_id'
     ];
 

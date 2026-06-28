@@ -14,7 +14,7 @@ class UmfrageOption extends Model
     protected $table = 'poll_options';
 
     protected $fillable = [
-        'poll_id', 
+        'discussion_answer_id',
         'option_text'
         #, 'mehrfachauswahl' // Falls Sie diese Funktionalität hinzufügen möchten
     ];

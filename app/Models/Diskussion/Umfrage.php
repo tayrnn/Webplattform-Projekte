@@ -10,12 +10,13 @@ use App\Models\Projekt\Projekt;
 
 class Umfrage extends Model
 {
-    protected $table = 'polls';
+    protected $table = 'discussion_answers';
 
     protected $fillable = [
-        'projekt_id',
+        'discussion_id',
         'user_id',
-        'frage',
+        'content',
+        'ist_umfrage',
     ];
 
     /**
@@ -32,9 +33,9 @@ class Umfrage extends Model
     public function ersteller(): BelongsTo
     {
         return $this->belongsTo(Nutzer::class, 'user_id')
-        ->withDefault([
-            'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
-        ]);
+            ->withDefault([
+                'name' => 'Unbekannter Nutzer', // Gelöschter Nutzer
+            ]);
     }
 
     /**
@@ -42,7 +43,7 @@ class Umfrage extends Model
      */
     public function optionen(): HasMany
     {
-        return $this->hasMany(UmfrageOption::class, 'poll_id');
+        return $this->hasMany(UmfrageOption::class, 'discussion_answer_id');
     }
 
     /**
@@ -50,7 +51,7 @@ class Umfrage extends Model
      */
     public function stimmen(): HasMany
     {
-        return $this->hasMany(UmfrageStimme::class, 'poll_id');
+        return $this->hasMany(UmfrageStimme::class, 'discussion_answer_id');
     }
 
     /**
@@ -59,5 +60,10 @@ class Umfrage extends Model
     public function hatNutzerAbgestimmt($nutzerId): bool
     {
         return $this->stimmen()->where('user_id', $nutzerId)->exists();
+    }
+
+    public function discussion()
+    {
+        return $this->belongsTo(\App\Models\Diskussion\Diskussion::class, 'discussion_id');
     }
 }

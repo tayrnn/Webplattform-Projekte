@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('ratings', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('projekt_id')->constrained('projects')->cascadeOnDelete();
+            $table->foreignId('nutzer_id')->constrained('users')->cascadeOnDelete();
+
+            $table->unsignedTinyInteger('sterne');
+            $table->text('kommentar')->nullable();
+
             $table->timestamps();
+
+            $table->unique(['projekt_id', 'nutzer_id']);
         });
     }
 

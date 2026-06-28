@@ -53,14 +53,14 @@ class UmfrageController extends Controller
         $request->validate([
             'option_id' => [
                 'required',
-                'exists:umfrage_optionen,id',
+                'exists:poll_options,id',
                 function ($attribute, $value, $fail) use ($umfrageId) {
-                    $optionExistiertInUmfrage = DB::table('umfrage_optionen')
+                    $optionExistiertInUmfrage = DB::table('poll_options')
                         ->where('id', $value)
-                        ->where('umfrage_id', $umfrageId)
+                        ->where('discussion_answer_id', $umfrageId)
                         ->exists();
-                    
-                    
+
+
                     if (!$optionExistiertInUmfrage) {
                         $fail('Die ausgewählte Option gehört nicht zu dieser Umfrage.');
                     }
@@ -75,9 +75,9 @@ class UmfrageController extends Controller
         }
 
         UmfrageStimme::create([
-            'umfrage_id' => $umfrage->id,
+            'discussion_answer_id' => $umfrage->id,
             'user_id' => Auth::id(),
-            'umfrage_option_id' => $request->option_id,
+            'poll_option_id' => $request->option_id,
         ]);
 
         return redirect()->back()->with('erfolg', 'Deine Stimme wurde gezählt!');
@@ -90,7 +90,7 @@ class UmfrageController extends Controller
     {
         $umfrage = Umfrage::findOrFail($umfrageId);
 
-        $stimme = UmfrageStimme::where('umfrage_id', $umfrage->id)
+        $stimme = UmfrageStimme::where('discussion_answer_id', $umfrage->id)
             ->where('user_id', Auth::id())
             ->first();
 
@@ -126,11 +126,9 @@ class UmfrageController extends Controller
         }
 
         $umfrage->optionen()->delete();
-        UmfrageStimme::where('umfrage_id', $umfrage->id)->delete();
+        UmfrageStimme::where('discussion_answer_id', $umfrage->id)->delete();
         $umfrage->delete();
 
         return redirect()->back()->with('erfolg', 'Umfrage wurde gelöscht.');
-
     }
-
 }

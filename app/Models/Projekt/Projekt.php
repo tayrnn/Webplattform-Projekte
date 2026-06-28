@@ -58,13 +58,19 @@ class Projekt extends Model
     // ein Projekt hat viele Bewertungen
     public function bewertungen(): HasMany
     {
-        return $this->hasMany(Bewertung::class, 'project_id');
+        return $this->hasMany(\App\Models\Projekt\Bewertung::class, 'projekt_id');
     }
 
     // ein Projekt gehört zu vielen Kategorien (n:m Beziehung)
     public function kategorien(): BelongsToMany
     {
         return $this->belongsToMany(Kategorie::class, 'projekt_kategorie', 'projekt_id', 'kategorie_id');
+    }
+
+    // ein Projekt wird ggf. von einem Lehrenden betreut
+    public function betreuer(): BelongsTo
+    {
+        return $this->belongsTo(Nutzer::class, 'betreuer_id');
     }
 
     /*
