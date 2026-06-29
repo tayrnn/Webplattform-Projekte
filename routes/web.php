@@ -30,8 +30,13 @@ Route::middleware('auth')->group(function () {
 //Route::get('/', [ProjektController::class, 'liste'])->name('projekte.liste');
 Route::get('/', [SuchenFilternController::class, 'suchen'])->name('projekte.liste');
 Route::get('/dashboard', function () {
-    return view('dashboard');
-});
+    return match (auth()->user()->role) {
+        'student' => redirect('/student'),
+        'lehrender' => redirect('/lehrende'),
+        'admin' => redirect('/admin'),
+        default => redirect('/'),
+    };
+})->middleware('auth');
 
 // --- STUDENT-ROUTEN ---
 Route::get('/student', function () {
@@ -131,3 +136,5 @@ Route::post('/projekt/{id}/betreuung-beenden', [BetreuungController::class, 'bee
 Route::get('/test', function () {
     return view('test');
 });
+
+require __DIR__ . '/auth.php';

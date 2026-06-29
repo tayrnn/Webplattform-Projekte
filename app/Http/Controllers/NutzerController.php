@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
 class NutzerController extends Controller
@@ -23,18 +24,18 @@ class NutzerController extends Controller
             'role' => ['required', 'in:student,lehrender,admin'],
         ]);
 
-        $temporaryPassword = Str::random(10);
-
-        User::create([
+        $user = User::create([
             'name' => $validated['vorname'] . ' ' . $validated['nachname'],
             'username' => Str::slug($validated['vorname'] . '.' . $validated['nachname']) . rand(100, 999),
             'email' => $validated['email'],
-            'password' => Hash::make($temporaryPassword),
+            'password' => Hash::make(Str::random(32)),
             'role' => $validated['role'],
         ]);
 
+        Password::sendResetLink(['email' => $user->email]);
+
         return redirect('/admin/nutzer/neu')
-            ->with('success', 'Benutzer wurde erstellt. Temporäres Passwort: ' . $temporaryPassword);
+            ->with('success', 'Benutzer wurde erstellt. Eine E-Mail zum Festlegen des Passworts wurde versendet.');
     }
 
     public function loeschen($id)
