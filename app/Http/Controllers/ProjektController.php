@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Projekt\Bearbeitungsstatus;
 use Illuminate\Http\Request;
 use App\Models\Projekt\Projekt;
 use App\Models\Projekt\Kategorie;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ProjektController extends Controller
 {
+    /*
     // Alle Projekte anzeigen (mit Filter nach Status)
     public function liste(Request $request)
     {
@@ -47,6 +49,8 @@ class ProjektController extends Controller
             'istAdmin'
         ));
     }
+        */
+    //-> erstmal auskommentiert -> bei web.php mit der suchen-Methode aus dem SuchenFilternController ersetzt, gab sonst Fehler bei der Datenbankabfrage
 
     // Nur eigene Projekte des eingeloggten Studenten anzeigen
     public function meine(Request $request)
@@ -96,8 +100,7 @@ class ProjektController extends Controller
         Projekt::create([
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
-            'bearbeitungsstatus' => 'neu',
-            'mitglied'           => '',
+            'bearbeitungsstatus' => Bearbeitungsstatus::Offen,
             'ersteller_id'            => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
@@ -165,7 +168,7 @@ class ProjektController extends Controller
         $projekt->update([
             'projektname'  => $validierteEingaben['projektname'],
             'beschreibung' => $validierteEingaben['beschreibung'],
-            'is_public'    => $request->input('is_public', 1),
+            'is_public' => (int)$request->input('is_public', 1),
         ]);
 
         return redirect()->route('projekte.details', $projekt->id)
