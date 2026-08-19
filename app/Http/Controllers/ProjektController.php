@@ -91,7 +91,8 @@ class ProjektController extends Controller
         $validierteEingaben = $request->validate([
             'projektname'  => 'required|string|max:255',
             'beschreibung' => 'required|string',
-            'category_id' => 'nullable|exists:categories,id',
+            'category_id' => 'nullable|array',
+            'category_id.*' => 'exists:categories,id',
         ]);
 
         // Projekt erstellen - Status wird automatisch auf "neu" gesetzt
@@ -99,11 +100,11 @@ class ProjektController extends Controller
             'projektname'        => $validierteEingaben['projektname'],
             'beschreibung'       => $validierteEingaben['beschreibung'],
             'bearbeitungsstatus' => Bearbeitungsstatus::Offen,
-            'ersteller_id'            => Auth::id(),
+            'ersteller_id'       => Auth::id(),
             'is_public'          => $request->input('is_public', 1),
         ]);
 
-        $projekt->kategorien()->attach($validierteEingaben['category_id']);
+        $projekt->kategorien()->sync($validierteEingaben['category_id'] ?? []);
 
         return redirect()->route('projekte.liste')
             ->with('erfolg', 'Deine Projektidee wurde erfolgreich eingereicht!');
@@ -112,7 +113,7 @@ class ProjektController extends Controller
     // Ein Projekt anzeigen
     public function details($id)
     {
-        $projekt = Projekt::with(['ersteller'])->findOrFail($id);
+        $projekt = Projekt::with(['ersteller', 'kategorien'])->findOrFail($id);
 
         // Sicherheitspruefung: Private Projekte nur fuer Ersteller sichtbar
         if (!$projekt->is_public && $projekt->ersteller_id !== Auth::id()) {
@@ -151,7 +152,7 @@ class ProjektController extends Controller
     // Bearbeitungs-Formular anzeigen (nur fuer eigene Idee)
     public function bearbeiten($id)
     {
-        $projekt = Projekt::findOrFail($id);
+        $projekt = Projekt::with('kategorien')->findOrFail($id);
 
         // Sicherheitspruefung: nur der Ersteller darf bearbeiten
         if ($projekt->ersteller_id !== Auth::id()) {
@@ -179,13 +180,18 @@ class ProjektController extends Controller
         $validierteEingaben = $request->validate([
             'projektname'  => 'required|string|max:255',
             'beschreibung' => 'required|string',
+            'category_id' => 'nullable|array',
+            'category_id.*' => 'exists:categories,id',
         ]);
 
         $projekt->update([
             'projektname'  => $validierteEingaben['projektname'],
             'beschreibung' => $validierteEingaben['beschreibung'],
-            'is_public' => (int)$request->input('is_public', 1),
+            'is_public'    => (int)$request->input('is_public', 1),
         ]);
+
+        //Kategorien aktualisieren
+        $projekt->kategorien()->sync($validierteEingaben['category_id'] ?? []);
 
         return redirect()->route('projekte.details', $projekt->id)
             ->with('erfolg', 'Projektidee erfolgreich aktualisiert!');

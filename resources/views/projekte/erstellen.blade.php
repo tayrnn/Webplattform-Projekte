@@ -76,22 +76,15 @@
                         <div>
                             <label for="category_id"
                                 class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-                                Kategorie <span class="text-red-500">*</span>
+                                Kategorien <span class="text-red-500">*</span>
                             </label>
-                            <select id="category_id" name="category_id"
-                                class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-[#0066cc] {{ $errors->has('category_id') ? 'border-red-400' : '' }}"
-                                required>
-                                <option value="" disabled selected>Kategorie wählen …</option>
-                                @foreach($kategorien as $kategorie)
-                                <option value="{{ $kategorie->id }}"
-                                    {{ old('category_id') == $kategorie->id ? 'selected' : '' }}>
-                                    {{ $kategorie->name }}
-                                </option>
-                                @endforeach
-                            </select>
-                            @error('category_id')
-                            <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
-                            @enderror
+
+                            @foreach($kategorien as $kategorie)
+                                <label class="flex items-center gap-2">
+                                    <input type="checkbox" name="category_id[]" value="{{ $kategorie->id }}">
+                                    <span class="text-sm text-gray-700">{{ $kategorie->name }}</span>
+                                </label>
+                            @endforeach
                         </div>
 
                         {{-- Bild-Upload (optional)

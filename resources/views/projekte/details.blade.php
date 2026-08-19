@@ -263,7 +263,7 @@
 
                         <div class="space-y-3 text-sm">
                             <div class="flex justify-between items-center py-2 border-b border-gray-100">
-                                <span class="text-gray-400">Kategorie</span>
+                                <span class="text-gray-400">Kategorien</span>
                                 <span class="font-semibold text-gray-700 text-right">
                                     {{ $projekt->kategorien->pluck('name')->implode(', ') ?: '—' }}
                                 </span>
