@@ -32,8 +32,12 @@ class NutzerController extends Controller
             'role' => $validated['role'],
         ]);
 
-        Password::sendResetLink(['email' => $user->email]);
+        $status = Password::sendResetLink(['email' => $user->email]);
 
+        if ($status !== Password::RESET_LINK_SENT) {
+            return redirect('/admin/nutzer/neu')
+                ->with('fehler', 'Benutzer wurde erstellt, aber die E-Mail konnte nicht versendet werden.');
+        }
         return redirect('/admin/nutzer/neu')
             ->with('success', 'Benutzer wurde erstellt. Eine E-Mail zum Festlegen des Passworts wurde versendet.');
     }
