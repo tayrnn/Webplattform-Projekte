@@ -120,6 +120,19 @@
                             {{ $message }}
                         </p>
                         @enderror
+
+                        {{-- Passwort vergessen --}}
+
+                        <div style="text-align:right; margin-top:8px;">
+
+                            <a href="{{ route('password.request') }}"
+                                style="font-size:13px; color:#6ba9dc; text-decoration:none;">
+
+                                Passwort vergessen?
+
+                            </a>
+
+                        </div>
                     </div>
 
                     {{-- Anmelden Button --}}
