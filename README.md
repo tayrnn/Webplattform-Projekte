@@ -1,58 +1,340 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# UniProjekte – Webplattform für Projektideen
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+UniProjekte ist eine mit Laravel entwickelte Webanwendung zur Verwaltung und Darstellung von Projektideen. Die Anwendung unterscheidet zwischen den Nutzerrollen Student, Lehrender und Administrator.
 
-## About Laravel
+## 1. Voraussetzungen
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Für die lokale Ausführung werden folgende Programme benötigt:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Visual Studio Code  
+  https://code.visualstudio.com/download
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- XAMPP mit MySQL  
+  https://sourceforge.net/projects/xampp/files/XAMPP%20Windows/8.0.30/
 
-## Learning Laravel
+- PHP 8.3 oder höher  
+  Verwendet: PHP 8.5.6  
+  https://www.php.net/downloads.php
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- Composer  
+  Verwendet: Composer 2.9.7  
+  https://getcomposer.org/download/
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Node.js und npm  
+  Verwendet: Node.js 24.15.0, npm 11.12.1  
+  https://nodejs.org/en/download
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- Git  
+  Verwendet: Git 2.54.0  
+  https://git-scm.com/downloads
 
-## Agentic Development
+- Laravel Framework 13  
+  Verwendet: Laravel 13.7.0
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Falls unter Windows eine benötigte Visual-C++-Laufzeitbibliothek fehlt:
 
-```bash
-composer require laravel/boost --dev
+https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
-php artisan boost:install
+### Installation unter Windows
+
+Visual Studio Code kann z. B. als ZIP-Datei heruntergeladen und nach
+
+```text
+C:\dev\Programme
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+entpackt werden. Anschließend `Code.exe` ausführen.
 
-## Contributing
+XAMPP kann z. B. nach
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```text
+C:\xampp
+```
 
-## Code of Conduct
+entpackt und über `xampp-control.exe` gestartet werden.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Bei der Composer-Installation muss gegebenenfalls die verwendete PHP-Datei ausgewählt werden, z. B.:
 
-## Security Vulnerabilities
+```text
+C:\dev\Programme\php-8.5.10-Win32-vs17-x64\php.exe
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Der konkrete Pfad kann je nach Installation abweichen.
 
-## License
+Falls PHP, Node.js oder MySQL im Terminal nicht gefunden werden, müssen die entsprechenden Pfade gegebenenfalls zur Windows-Umgebungsvariable `Path` hinzugefügt werden.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Beispiel:
+
+```text
+C:\dev\Programme\Node.js
+C:\xampp\php
+C:\xampp\mysql\bin
+```
+
+## 2. Einrichtung
+
+### Projekt herunterladen
+
+```bash
+git clone -b main https://github.com/tayrnn/Webplattform-Projekte.git ordner_name
+cd ordner_name
+```
+
+Alternativ kann der Projektordner aus der ZIP-Datei entpackt werden.
+
+Falls ein bereits vorhandener Projektordner verwendet wird, können die Ordner node_modules und vendor gelöscht werden. Sie werden später durch die Installation mit npm und Composer neu erstellt.
+
+### Projekt in VS Code öffnen
+
+```text
+File -> Open Folder... -> ordner_name
+```
+
+Neues Terminal:
+
+```text
+Strg + ö
+```
+
+### PHP-Abhängigkeiten installieren
+
+```bash
+composer install
+```
+
+Typisches Problem: `fileinfo` ist nicht aktiviert.
+
+In der verwendeten `php.ini` nach
+
+```ini
+extension=fileinfo
+```
+
+suchen und gegebenenfalls das Semikolon davor entfernen.
+
+Beispielpfad:
+
+```text
+C:\dev\Programme\php-8.5.10-Win32-vs17-x64\php.ini
+```
+
+Danach `composer install` erneut ausführen.
+
+Falls Composer ausdrücklich eine Aktualisierung verlangt, kann gegebenenfalls
+
+```bash
+composer update
+```
+
+notwendig sein.
+
+### Node-Abhängigkeiten installieren
+
+```bash
+npm install
+```
+
+Typisches Problem unter Windows PowerShell:
+
+Falls die Skriptausführung blockiert wird:
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### `.env` erstellen
+
+```powershell
+Copy-Item .env.example .env -Force
+```
+
+Danach:
+
+```bash
+php artisan key:generate
+```
+
+### Datenbank einrichten
+
+XAMPP öffnen und MySQL starten.
+
+Eine Datenbank mit dem Namen
+
+```text
+webplattform
+```
+
+erstellen.
+
+Die `.env` folgendermaßen konfigurieren:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=webplattform
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Danach:
+
+```bash
+php artisan migrate
+```
+
+Für einen vollständigen Neuaufbau inklusive Testdaten:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+Achtung: `migrate:fresh` löscht vorhandene Tabellen.
+
+Typisches Problem bei der Datenbankverbindung:
+
+In der verwendeten `php.ini` müssen folgende Erweiterungen aktiviert sein:
+
+```ini
+extension=mysqli
+extension=pdo_mysql
+```
+
+## 3. Starten der Webanwendung
+
+XAMPP öffnen und MySQL starten.
+
+Frontend erstellen:
+
+```bash
+npm run build
+```
+
+Alternativ während der Entwicklung:
+
+```bash
+npm run dev
+```
+
+Laravel-Server starten:
+
+```bash
+php artisan serve
+```
+
+Anschließend die im Terminal angezeigte Adresse im Browser öffnen, z. B.:
+
+```text
+http://127.0.0.1:8000
+```
+
+Bei `npm run dev` muss der entsprechende Terminal-Prozess weiterlaufen.
+
+## 4. Zugangsdaten und Konfiguration
+
+Nach
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+stehen folgende Testaccounts zur Verfügung:
+
+| Rolle         | E-Mail             | Passwort     |
+| ------------- | ------------------ | ------------ |
+| Administrator | admin@example.com  | admin12345   |
+| Student       | student@test.local | student12345 |
+| Lehrender     | lehrer@test.local  | lehrer12345  |
+
+Die Testaccounts werden über die Seeder unter
+
+```text
+database/seeders
+```
+
+erstellt.
+
+### Mailtrap
+
+Für den Test des E-Mail-Versands wird Mailtrap Sandbox verwendet.
+
+Die E-Mail-Funktion wird unter anderem für das erstmalige Festlegen eines Passworts bei neu angelegten Nutzern sowie für „Passwort vergessen?“ verwendet.
+
+Die persönlichen Mailtrap-Zugangsdaten sind nicht im Repository enthalten und müssen lokal in der `.env` eingetragen werden:
+
+```env
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_FROM_ADDRESS="noreply@uniprojekte.test"
+MAIL_FROM_NAME="UniProjekte"
+```
+
+`MAIL_USERNAME` und `MAIL_PASSWORD` müssen durch die eigenen Mailtrap-SMTP-Zugangsdaten ersetzt werden.
+
+Mailtrap Sandbox fängt Test-E-Mails ab und versendet sie nicht an reale E-Mail-Postfächer.
+
+## 5. Testen der wichtigsten Funktionen
+
+Nach der Einrichtung und dem Start der Anwendung können die wichtigsten Funktionen mit den unter Punkt 4 angegebenen Testaccounts geprüft werden.
+
+### Anmeldung und Rollen
+
+1. Mit einem Testaccount als Student, Lehrender oder Administrator anmelden.
+2. Prüfen, ob die zur jeweiligen Rolle gehörende Ansicht angezeigt wird.
+3. Prüfen, ob nur die für diese Rolle vorgesehenen Funktionen verfügbar sind.
+
+### Projektverwaltung
+
+1. Als Student anmelden und über „Neue Idee“ ein Projekt erstellen.
+2. Projektname, Beschreibung, Kategorien und Sichtbarkeit festlegen und das Projekt speichern.
+3. Prüfen, ob das Projekt in der entsprechenden Projektübersicht erscheint.
+4. Das eigene Projekt öffnen und Bearbeitung, Statusänderung und Löschen testen.
+5. Bei einem privaten Projekt prüfen, ob es nur für den Ersteller sichtbar ist.
+
+### Suche und Filter
+
+1. In der Projektübersicht einen vollständigen oder teilweisen Projektnamen in das Suchfeld eingeben.
+2. Alternativ nach dem Namen eines Erstellers suchen.
+3. Prüfen, ob die passenden Projekte angezeigt werden.
+4. Über „Filter“ Kategorien oder Bearbeitungsstatus auswählen.
+5. Prüfen, ob die Projektliste entsprechend gefiltert wird.
+6. Suche und Filter können auch gemeinsam getestet werden.
+
+### Diskussionen und Kommentare
+
+1. Ein Projekt öffnen und eine Diskussion beziehungsweise einen Kommentar erstellen.
+2. Prüfen, ob der neue Beitrag angezeigt wird.
+3. Vorhandene eigene Beiträge bearbeiten beziehungsweise löschen und prüfen, ob die Änderungen übernommen werden.
+
+### Umfragen und Bewertungen
+
+1. Ein Projekt mit einer Umfrage öffnen und eine Antwort auswählen.
+2. Abstimmen und prüfen, ob die Stimme übernommen wird.
+3. Eine Sternebewertung für ein Projekt abgeben.
+4. Prüfen, ob die Bewertung gespeichert und in der Bewertung des Projekts berücksichtigt wird.
+
+### Betreuung von Projekten
+
+1. Als Lehrender anmelden und die öffentlichen Projektideen öffnen.
+2. Ein noch nicht betreutes Projekt auswählen und die Betreuung übernehmen.
+3. Prüfen, ob das Projekt anschließend unter „Betreute Projekte“ angezeigt wird.
+
+### Benutzerverwaltung
+
+1. Als Administrator anmelden und die Nutzerverwaltung öffnen.
+2. Einen neuen Benutzer mit Name, E-Mail-Adresse und Rolle anlegen.
+3. Prüfen, ob der Benutzer in der Nutzerverwaltung erscheint.
+4. Einen Benutzer bearbeiten beziehungsweise löschen und prüfen, ob die Änderung übernommen wird.
+
+### Passwortfunktionen
+
+1. Auf der Login-Seite „Passwort vergessen?“ auswählen und die E-Mail-Adresse eines vorhandenen Benutzers eingeben.
+2. Prüfen, ob die entsprechende E-Mail in der Mailtrap Sandbox erscheint.
+3. Über den enthaltenen Link ein neues Passwort festlegen und die Anmeldung damit testen.
+4. Beim Anlegen eines neuen Benutzers durch einen Administrator kann auf die gleiche Weise geprüft werden, ob die E-Mail zum erstmaligen Festlegen des Passworts erzeugt wird.
+
+Bei eingerichteter Mailtrap Sandbox kann zusätzlich geprüft werden, ob beim Anlegen eines neuen Nutzers die E-Mail zum Festlegen des Passworts erzeugt wird.
