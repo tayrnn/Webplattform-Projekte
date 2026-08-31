@@ -1,0 +1,53 @@
+@props(['title', 'status','beschreibung' => '', 'needsSupervision' => false, 'projektId' => 1, 'id', 'isPublic' =>
+true, 'zeigeSichtbarkeit' => false])
+
+@php
+$statusWert = $status instanceof \App\Models\Projekt\Bearbeitungsstatus ? $status->value : ($status ?? 'offen');
+$statusConfig = match(strtolower($statusWert)) {
+'abgeschlossen' => ['bg' => 'bg-gray-100 text-gray-600', 'label' => 'Abgeschlossen'],
+'in bearbeitung', 'in_bearbeitung' => ['bg' => 'bg-blue-100 text-blue-700', 'label' => 'In Bearbeitung'],
+'offen' => ['bg' => 'bg-green-100 text-green-700', 'label' => 'Offen'],
+'betreuer gesucht','betreuer_gesucht' => ['bg' => 'bg-yellow-100 text-yellow-700','label' => 'Betreuer gesucht'],
+default => ['bg' => 'bg-gray-100 text-gray-500', 'label' => $status],
+};
+@endphp
+
+<div class="bg-white p-6 rounded-xl border border-gray-200 flex flex-col h-full
+            shadow-sm transition-all duration-200
+            hover:border-blue-300 hover:shadow-md hover:ring-2 hover:ring-blue-100">
+
+    <div class="flex justify-between items-start">
+
+        <!-- Linke Seite: Titel und Label -->
+        <div class="flex flex-col items-start">
+            <h3 class="text-xl font-bold text-[#1a202c]">{{ $title }}</h3>
+            
+        @if($zeigeSichtbarkeit)
+            @if(!$isPublic)
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-gray-100 text-gray-600 border border-gray-300">
+                🔒 Privat
+            </span>
+            @else
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium rounded bg-blue-50 text-blue-600 border border-blue-200">
+                🌐 Öffentlich
+            </span>
+            @endif
+        @endif
+        </div>
+        <span class="px-3 py-1 text-xs font-semibold rounded-full ml-4 whitespace-nowrap {{ $statusConfig['bg'] }}">
+            {{ $statusConfig['label'] }}
+        </span>
+    </div>
+
+    <p class="text-gray-500 text-sm mt-6 mb-6 flex-grow">
+        {{ Str::limit($beschreibung, 80)}}
+    </p>
+
+    <div>
+        {{-- Link zur Diskussionsseite --}}
+        <a href="{{ route('projekte.details', $projektId) }}"
+            class="text-[#0066cc] font-medium text-sm hover:underline">
+            Details ansehen &rarr;
+        </a>
+    </div>
+</div>
